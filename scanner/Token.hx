@@ -40,91 +40,91 @@ class Token {
         return (type == aType && ("" == aValue || value.toLowerCase() == aValue));
     }
 
-    public function isWhiteSpace(w : String) : Bool {
+    public function isWhiteSpace(?w : String) : Bool {
     	return _isOfType(WHITESPACE_TYPE, w);
     }
 
-    function isString() : Bool
+    public function isString() : Bool
     {
         return _isOfType(STRING_TYPE, "");
     }
 
-    function isComment() : Bool
+    public function isComment() : Bool
     {
         return _isOfType(COMMENT_TYPE, "");
     }
 
-    function isNumber(n) : Bool
+    public function isNumber(n) : Bool
     {
         return _isOfType(NUMBER_TYPE, n);
     }
 
-    function isIdent(i) : Bool
+    public function isIdent(i) : Bool
     {
         return _isOfType(IDENT_TYPE, i);
     }
 
-    function isFunction(f) : Bool
+    public function isFunction(f) : Bool
     {
         return _isOfType(FUNCTION_TYPE, f);
     }
 
-    function isAtRule(a) : Bool
+    public function isAtRule(a) : Bool
     {
         return _isOfType(ATRULE_TYPE, a);
     }
 
-    function isIncludes() : Bool
+    public function isIncludes() : Bool
     {
         return _isOfType(INCLUDES_TYPE, "");
     }
 
-    function isDashmatch() : Bool
+    public function isDashmatch() : Bool
     {
         return _isOfType(DASHMATCH_TYPE, "");
     }
 
-    function isBeginsmatch() : Bool
+    public function isBeginsmatch() : Bool
     {
         return _isOfType(BEGINSMATCH_TYPE, "");
     }
 
-    function isEndsmatch() : Bool
+    public function isEndsmatch() : Bool
     {
         return _isOfType(ENDSMATCH_TYPE, "");
     }
 
-    function isContainsmatch() : Bool
+    public function isContainsmatch() : Bool
     {
         return _isOfType(CONTAINSMATCH_TYPE, "");
     }
 
-    function isSymbol(c) : Bool
+    public function isSymbol(c) : Bool
     {
         return _isOfType(SYMBOL_TYPE, c);
     }
 
-    function isDimension() : Bool
+    public function isDimension() : Bool
     {
         return _isOfType(DIMENSION_TYPE, "");
     }
 
-    function isPercentage() : Bool
+    public function isPercentage() : Bool
     {
         return _isOfType(PERCENTAGE_TYPE, "");
     }
 
-    function isHex() : Bool
+    public function isHex() : Bool
     {
         return _isOfType(HEX_TYPE, "");
     }
 
-    function isDimensionOfUnit(aUnit) : Bool
+    public function isDimensionOfUnit(aUnit) : Bool
     {
         return (isDimension() && unit == aUnit);
     }
 
-    function isLength() : Bool
+    public function isLength() : Bool
     {
         return (isPercentage() ||
                 isDimensionOfUnit("cm") ||
@@ -137,7 +137,7 @@ class Token {
                 isDimensionOfUnit("pt"));
     }
 
-    function isAngle() : Bool
+    public function isAngle() : Bool
     {
         return (isDimensionOfUnit("deg") ||
                 isDimensionOfUnit("rad") ||

@@ -325,7 +325,7 @@ class Scanner {
         return s;
     }
 
-    function nextToken() : Token {
+    public function nextToken() : Token {
         var c = read();
         if (c == "")
             return new Token(NULL_TYPE, null, "");

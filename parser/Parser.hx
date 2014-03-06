@@ -11,6 +11,7 @@ class Parser {
     var mToken : Dynamic;
     var mLookAhead : Dynamic;
     var mError : String;
+
     var mScanner : Scanner;
 
     public function new(aString: String, aPreserveWS: Bool, aPreserveComments: Bool) {
