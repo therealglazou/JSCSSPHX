@@ -22,7 +22,7 @@ enum TokenType {
     HEX_TYPE;
 }
 
-class JscsspToken {
+class Token {
 
 
     var type : TokenType;

@@ -135,10 +135,10 @@ class Scanner {
         mPos--;
     }
 
-    function nextHexValue() : JscsspToken {
+    function nextHexValue() : Token {
         var c = read();
         if (c == "" || !isHexDigit(c))
-            return new JscsspToken(NULL_TYPE, null, "");
+            return new Token(NULL_TYPE, null, "");
         var s = c;
         c = read();
         while (c != "" && isHexDigit(c)) {
@@ -147,7 +147,7 @@ class Scanner {
         }
         if (c != "")
             pushback();
-        return new JscsspToken(HEX_TYPE, s, "");
+        return new Token(HEX_TYPE, s, "");
     }
 
     function isWhiteSpace(c : String) : Bool {
@@ -207,21 +207,21 @@ class Scanner {
         return s;
     }
 
-    function parseIdent(c : String) : JscsspToken {
+    function parseIdent(c : String) : Token {
         var value = gatherIdent(c);
         var nextChar = peek();
         if (nextChar == "(") {
             value += read();
-            return new JscsspToken(FUNCTION_TYPE, value, "");
+            return new Token(FUNCTION_TYPE, value, "");
         }
-        return new JscsspToken(IDENT_TYPE, value, "");
+        return new Token(IDENT_TYPE, value, "");
     }
 
     function isDigit(c : String) : Bool {
         return (c >= '0') && (c <= '9');
     }
 
-    function parseComment(c : String) : JscsspToken {
+    function parseComment(c : String) : Token {
         var s = c;
         while ((c = read()) != "") {
           s += c;
@@ -236,10 +236,10 @@ class Scanner {
             pushback();
           }
         }
-        return new JscsspToken(COMMENT_TYPE, s, "");
+        return new Token(COMMENT_TYPE, s, "");
     }
 
-    function parseNumber(c : String) : JscsspToken {
+    function parseNumber(c : String) : Token {
         var s = c;
         var foundDot = false;
         while ((c = read()) != "") {
@@ -259,18 +259,18 @@ class Scanner {
         if (c != "" && startsWithIdent(c, peek())) { // DIMENSION
             var unit = gatherIdent(c);
             s += unit;
-            return new JscsspToken(DIMENSION_TYPE, s, unit);
+            return new Token(DIMENSION_TYPE, s, unit);
         }
         else if (c == "%") {
             s += "%";
-            return new JscsspToken(PERCENTAGE_TYPE, s, "");
+            return new Token(PERCENTAGE_TYPE, s, "");
         }
         else if (c != "")
             pushback();
-        return new JscsspToken(NUMBER_TYPE, s, "");
+        return new Token(NUMBER_TYPE, s, "");
     }
 
-    function parseString(aStop : String) : JscsspToken {
+    function parseString(aStop : String) : Token {
         var s = aStop;
         var previousChar = aStop;
         var c;
@@ -306,11 +306,11 @@ class Scanner {
     
             previousChar = c;
         }
-        return new JscsspToken(STRING_TYPE, s, "");
+        return new Token(STRING_TYPE, s, "");
     } 
 
-    function parseAtKeyword(c : String) : JscsspToken {
-        return new JscsspToken(ATRULE_TYPE, gatherIdent(c), "");
+    function parseAtKeyword(c : String) : Token {
+        return new Token(ATRULE_TYPE, gatherIdent(c), "");
     }
 
     function eatWhiteSpace(c : String) : String {
@@ -325,10 +325,10 @@ class Scanner {
         return s;
     }
 
-    function nextToken() : JscsspToken {
+    function nextToken() : Token {
         var c = read();
         if (c == "")
-            return new JscsspToken(NULL_TYPE, null, "");
+            return new Token(NULL_TYPE, null, "");
 
         if (startsWithIdent(c, peek()))
             return parseIdent(c);
@@ -365,7 +365,7 @@ class Scanner {
         if (isWhiteSpace(c)) {
             var s = eatWhiteSpace(c);
       
-            return new JscsspToken(WHITESPACE_TYPE, s, "");
+            return new Token(WHITESPACE_TYPE, s, "");
         }
 
         if (c == "|" || c == "~" || c == "^" || c == "$" || c == "*") {
@@ -373,15 +373,15 @@ class Scanner {
             if (nextChar == "=") {
                 switch (c) {
                     case "~" :
-                        return new JscsspToken(INCLUDES_TYPE, "~=", "");
+                        return new Token(INCLUDES_TYPE, "~=", "");
                     case "|" :
-                        return new JscsspToken(DASHMATCH_TYPE, "|=", "");
+                        return new Token(DASHMATCH_TYPE, "|=", "");
                     case "^" :
-                        return new JscsspToken(BEGINSMATCH_TYPE, "^=", "");
+                        return new Token(BEGINSMATCH_TYPE, "^=", "");
                     case "$" :
-                        return new JscsspToken(ENDSMATCH_TYPE, "$=", "");
+                        return new Token(ENDSMATCH_TYPE, "$=", "");
                     case "*" :
-                        return new JscsspToken(CONTAINSMATCH_TYPE, "*=", "");
+                        return new Token(CONTAINSMATCH_TYPE, "*=", "");
                 }
             } else if (nextChar != "")
             pushback();
@@ -390,6 +390,6 @@ class Scanner {
         if (c == "/" && peek() == "*")
             return parseComment(c);
 
-        return new JscsspToken(SYMBOL_TYPE, c, "");
+        return new Token(SYMBOL_TYPE, c, "");
     }
 }
