@@ -88,6 +88,9 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
      * CONSTRUCTOR
      */
     public function new() {
-        
+        this.parentRule = null;
+        this.mPropertyNameArray = [];
+        this.mPropertyValueArray = [];
+        this.mPropertyPriorityArray = [];
     }
 }
