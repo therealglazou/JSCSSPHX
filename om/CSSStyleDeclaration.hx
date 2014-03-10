@@ -21,8 +21,15 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
     private var mPropertyPriorityArray : Array<String>; 
 
     private function get_cssText() : String {
-        // TBD when serializer and om are done
-        return "";
+        var rv : String = "";
+        for (i in 0...this.mPropertyNameArray.length - 1) {
+            rv += ("" != rv) ? " " : "";
+            rv += this.mPropertyNameArray[i] + ": " + this.mPropertyValueArray[i];
+            if ("" != this.mPropertyPriorityArray[i])
+                rv += " !important";
+            rv += ";";
+        }
+        return rv;
     }
 
     private function set_cssText(v : String) : String {
