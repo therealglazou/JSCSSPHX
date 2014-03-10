@@ -12,7 +12,7 @@ class StyleSheet implements DOMStyleSheet
      * from DOMStyleSheet interface
      */
 
- 	public var type(get, null) : String;
+    public var type(get, null) : String;
     public var disabled(get, set) : Bool;
     // public var ownerNode(default, null) : DOMNode;
     public var parentStyleSheet(get, null) : DOMStyleSheet;
