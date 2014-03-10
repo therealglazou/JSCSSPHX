@@ -2,6 +2,7 @@ package parser;
 
 import scanner.Scanner;
 import parser.Tokenizer;
+import om.classes.*;
 
 class Parser {
 
@@ -13,14 +14,21 @@ class Parser {
     var mError : String;
 
     var mScanner : Scanner;
+    var mTokenizer : Tokenizer;
 
-    public function new(aString: String, aPreserveWS: Bool, aPreserveComments: Bool) {
-        this.mPreserveWS = aPreserveWS;
-        this.mPreserveComments = aPreserveComments;
-        this.mPreservedTokens = [];
-        this.mError = null;
+    public function new() {
+    }
+
+    public function parse(aString: String, aPreserveWS: Bool, aPreserveComments: Bool) {
+        mPreserveWS = aPreserveWS;
+        mPreserveComments = aPreserveComments;
+        mPreservedTokens = [];
+        mError = null;
 
         // init the scanner with our string to parse
-        this.mScanner = new Scanner(aString);
+        mScanner = new Scanner(aString);
+        mTokenizer = new Tokenizer(mScanner);
+
+        var sheet = new StyleSheet();
     }
 }
