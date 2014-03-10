@@ -2,15 +2,15 @@ package om.interfaces;
 
 interface DOMMediaList {
 
-	/*
-	 *          attribute DOMString        mediaText;
-	 *                                       // raises(DOMException) on setting
-	 */
-	var mediaText(get, set) : String;
+    /*
+     *          attribute DOMString        mediaText;
+     *                                       // raises(DOMException) on setting
+     */
+    var mediaText(get, set) : String;
 
-	/*
-	 * readonly attribute unsigned long    length;
-	 */
+    /*
+     * readonly attribute unsigned long    length;
+     */
     var length(get, null) : UInt;
 
     /*

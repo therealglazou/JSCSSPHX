@@ -6,7 +6,7 @@ import om.interfaces.DOMMediaList;
 import om.classes.MediaList;
 
 class StyleSheet implements DOMStyleSheet
-	             implements DOMCSSStyleSheet {
+                 implements DOMCSSStyleSheet {
 
     /*
      * from DOMStyleSheet interface
@@ -28,39 +28,39 @@ class StyleSheet implements DOMStyleSheet
     private var mMediaList : DOMMediaList;
 
     private inline function get_type() : String {
-    	return mType;
+        return mType;
     }
 
     private inline function get_disabled() : Bool {
-    	return mDisabled;
+        return mDisabled;
     }
 
     private function set_disabled(v: Bool) : Bool {
-    	mDisabled = v;
-    	return v;
+        mDisabled = v;
+        return v;
     }
 
     private inline function get_parentStyleSheet() : DOMStyleSheet {
-    	return mParentStyleSheet;
+        return mParentStyleSheet;
     }
 
     private inline function get_href() : String {
-    	return mHref;
+        return mHref;
     }
 
     private inline function get_title() : String {
-    	return mTitle;
+        return mTitle;
     }
 
     private inline function get_media() : DOMMediaList {
-    	return mMediaList;
+        return mMediaList;
     }
 
     /*
      * from DOMCSSStyleSheet interface
      */
     public function insertRule(rule: String, index: UInt) : UInt {
-    	/// TBD
+        /// TBD
         return 0;
     }
 
@@ -68,11 +68,11 @@ class StyleSheet implements DOMStyleSheet
      * CONSTRUCTOR
      */
     public function new() {
-    	mType = "text/css";
-    	mDisabled = false;
-    	mParentStyleSheet = null;
-    	mHref = "";
-    	mTitle = "";
-    	mMediaList = new MediaList();
-	}
+        mType = "text/css";
+        mDisabled = false;
+        mParentStyleSheet = null;
+        mHref = "";
+        mTitle = "";
+        mMediaList = new MediaList();
+    }
 }

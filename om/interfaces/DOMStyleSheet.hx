@@ -3,9 +3,9 @@ package om.interfaces;
 import om.interfaces.DOMMediaList;
 
 interface DOMStyleSheet {
-	/*
-	 * readonly attribute DOMString        type;
-	 */
+    /*
+     * readonly attribute DOMString        type;
+     */
     var type(get, null) : String;
 
     /*

@@ -6,7 +6,7 @@ import om.classes.*;
 
 class Parser {
 
-	var mPreserveWS : Bool;
+    var mPreserveWS : Bool;
     var mPreserveComments : Bool;
     var mPreservedTokens : Dynamic;
     var mToken : Dynamic;

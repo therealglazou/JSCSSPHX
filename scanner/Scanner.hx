@@ -163,7 +163,7 @@ class Scanner {
             var code = 0;
             var j = 0;
             for (i in 0...6) {
-          	     j = i;
+                   j = i;
                 c = read();
                 if (isHexDigit(c))
                     code = code * 16 + kHexValues[c.toLowerCase()];

@@ -41,7 +41,7 @@ class Token {
     }
 
     public function isWhiteSpace(?w : String) : Bool {
-    	return _isOfType(WHITESPACE_TYPE, w);
+        return _isOfType(WHITESPACE_TYPE, w);
     }
 
     public function isString() : Bool
