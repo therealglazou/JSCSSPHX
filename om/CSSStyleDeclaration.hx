@@ -49,6 +49,7 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
     }
 
     public function removeProperty(propertyName : String) : String {
+        // TBD deal with shorthands
         var index = this.mPropertyNameArray.indexOf(propertyName);
         if (-1 == index)
             return "";
