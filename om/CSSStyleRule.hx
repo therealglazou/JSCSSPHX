@@ -28,6 +28,11 @@ class CSSStyleRule extends CSSRule
                + this.style.cssText + " }";
     }
 
+    override function set_cssText(v : String) : String {
+        // TBD when parsing and om are done
+        return v;
+    }
+
     /*
      * CONSTRUCTOR
      */
