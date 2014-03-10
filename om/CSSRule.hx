@@ -18,12 +18,28 @@ class CSSRule implements DOMCSSRule {
      */
 
     private function get_cssText() : String {
-        // TBD when om and seralization is done
+        // should be overriden by subclasses but who knows, eh?
+        switch (this.type) {
+            case UNKNOWN_RULE:
+            case STYLE_RULE:
+                return cast(this, CSSStyleRule).cssText;
+            case CHARSET_RULE:
+            case IMPORT_RULE:
+            case MEDIA_RULE:
+            case FONT_FACE_RULE:
+            case PAGE_RULE:
+            case KEYFRAMES_RULE:
+            case KEYFRAME_RULE:
+            case MOZ_KEYFRAMES_RULE:
+            case MOZ_KEYFRAME_RULE:
+            case NAMESPACE_RULE:
+            case SUPPORTS_RULE:
+            case FONT_FEATURE_VALUES_RULE:
+        }
         return "";
     }
 
     private function set_cssText(v : String) : String {
-        // TBD when parsing is done
         return v;
     }
 

@@ -23,6 +23,11 @@ class CSSStyleRule extends CSSRule
         return v;
     }
 
+    override function get_cssText() : String {
+        return this.selectorText + " { "
+               + this.style.cssText + " }";
+    }
+
     /*
      * CONSTRUCTOR
      */
