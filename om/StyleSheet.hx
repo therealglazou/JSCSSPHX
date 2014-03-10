@@ -41,6 +41,10 @@ class StyleSheet implements DOMStyleSheet
         return 0;
     }
 
+    public function deleteRule(index: UInt) : Void {
+        /// TBD
+    }
+
     /*
      * CONSTRUCTOR
      */
