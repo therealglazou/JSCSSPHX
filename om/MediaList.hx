@@ -13,11 +13,15 @@ class MediaList implements DOMMediaList {
 
     private var mMediaArray : Array<String>;
 
+    /*
+     * http://www.w3.org/TR/DOM-Level-2-Style/stylesheets.html#StyleSheets-MediaList
+     */
     private function get_mediaText() : String {
         return mMediaArray.join(", ");
     }
 
     private function set_mediaText(v : String) : String {
+        // TBD : validate v and throw SYNTAX_ERR if invalid
         var rv = v.split(",");
         mMediaArray = [];
         for (i in 0...rv.length - 1) {

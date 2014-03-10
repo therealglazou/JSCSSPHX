@@ -27,6 +27,9 @@ class StyleSheet implements DOMStyleSheet
     private var mTitle : String;
     private var mMediaList : DOMMediaList;
 
+    /*
+     * http://www.w3.org/TR/DOM-Level-2-Style/stylesheets.html#StyleSheets-StyleSheet
+     */
     private inline function get_type() : String {
         return mType;
     }
