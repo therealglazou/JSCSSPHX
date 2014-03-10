@@ -1,9 +1,9 @@
-package om.classes;
+package om;
 
 import om.interfaces.DOMStyleSheet;
 import om.interfaces.DOMCSSStyleSheet;
 import om.interfaces.DOMMediaList;
-import om.classes.MediaList;
+import om.MediaList;
 
 class StyleSheet implements DOMStyleSheet
                  implements DOMCSSStyleSheet {

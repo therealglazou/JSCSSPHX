@@ -1,4 +1,4 @@
-package om.classes;
+package om;
 
 import om.interfaces.DOMMediaList;
 import om.interfaces.DOMException;

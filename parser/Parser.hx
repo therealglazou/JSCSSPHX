@@ -2,7 +2,7 @@ package parser;
 
 import scanner.Scanner;
 import parser.Tokenizer;
-import om.classes.*;
+import om.*;
 
 class Parser {
 
