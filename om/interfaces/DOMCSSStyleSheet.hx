@@ -5,7 +5,7 @@ interface DOMCSSStyleSheet {
     /*
      * readonly attribute nsIDOMCSSRule     ownerRule;
      */
-    // var ownerRule(default, null) : DOMCSSRule;
+    var ownerRule(default, null) : DOMCSSRule;
 
     /*
      * readonly attribute nsIDOMCSSRuleList cssRules;

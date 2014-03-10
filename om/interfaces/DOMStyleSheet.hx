@@ -6,12 +6,12 @@ interface DOMStyleSheet {
     /*
      * readonly attribute DOMString        type;
      */
-    var type(get, null) : String;
+    var type(default, null) : String;
 
     /*
      *          attribute boolean          disabled;
      */
-    var disabled(get, set) : Bool;
+    var disabled(default, set) : Bool;
 
     /*
      * readonly attribute nsIDOMNode       ownerNode;
@@ -21,20 +21,20 @@ interface DOMStyleSheet {
     /*
      * readonly attribute nsIDOMStyleSheet parentStyleSheet;
      */
-    var parentStyleSheet(get, null) : DOMStyleSheet;
+    var parentStyleSheet(default, null) : DOMStyleSheet;
 
     /*
      * readonly attribute DOMString        href;
      */
-    var href(get, null) : String;
+    var href(default, null) : String;
 
     /*
      * readonly attribute DOMString        title;
      */
-    var title(get, null) : String;
+    var title(default, null) : String;
 
     /*
      * readonly attribute nsIDOMMediaList  media;
      */
-    var media(get, null) : DOMMediaList;
+    var media(default, null) : DOMMediaList;
 }
