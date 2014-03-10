@@ -4,7 +4,8 @@ import om.CSSStyleDeclaration;
 import om.interfaces.DOMCSSStyleRule;
 import om.interfaces.DOMCSSStyleDeclaration;
 
-class CSSStyleRule extends CSSRule implements DOMCSSStyleRule {
+class CSSStyleRule extends CSSRule
+                   implements DOMCSSStyleRule {
 
     /* from DOMCSSStyleRule interface
      * 
