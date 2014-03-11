@@ -28,6 +28,7 @@ class CSSRule implements DOMCSSRule {
             case IMPORT_RULE:
                 return cast(this, CSSImportRule).cssText;
             case MEDIA_RULE:
+                return cast(this, CSSMediaRule).cssText;
             case FONT_FACE_RULE:
             case PAGE_RULE:
             case KEYFRAMES_RULE:
@@ -52,6 +53,7 @@ class CSSRule implements DOMCSSRule {
             case IMPORT_RULE:
                 return cast(this, CSSImportRule).cssText = v;
             case MEDIA_RULE:
+                return cast(this, CSSMediaRule).cssText = v;
             case FONT_FACE_RULE:
             case PAGE_RULE:
             case KEYFRAMES_RULE:
