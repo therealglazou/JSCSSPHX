@@ -37,8 +37,6 @@ class CSSRule implements DOMCSSRule {
                 return cast(this, CSSKeyframesRule).cssText;
             case KEYFRAME_RULE:
                 return cast(this, CSSKeyframeRule).cssText;
-            case MOZ_KEYFRAMES_RULE:
-            case MOZ_KEYFRAME_RULE:
             case NAMESPACE_RULE:
             case SUPPORTS_RULE:
             case FONT_FEATURE_VALUES_RULE:
@@ -66,8 +64,6 @@ class CSSRule implements DOMCSSRule {
                 return cast(this, CSSKeyframesRule).cssText = v;
             case KEYFRAME_RULE:
                 return cast(this, CSSKeyframeRule).cssText = v;
-            case MOZ_KEYFRAMES_RULE:
-            case MOZ_KEYFRAME_RULE:
             case NAMESPACE_RULE:
             case SUPPORTS_RULE:
             case FONT_FEATURE_VALUES_RULE:
