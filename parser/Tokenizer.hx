@@ -1,19 +1,7 @@
-package parser;
-
-import scanner.Token;
-import scanner.Scanner;
-
-class Tokenizer {
 
     var mScanner : Scanner;
     var mToken : Token;
     var mLookAhead : Token;
-
-    public function new(aScanner : Scanner) {
-        mScanner = aScanner;
-        mToken = null;
-        mLookAhead = null;
-    }
 
     public function currentToken() : Token {
         return mToken;
@@ -48,4 +36,3 @@ class Tokenizer {
 
         return token;
     }
-}

@@ -35,6 +35,11 @@ class Token {
         unit = aUnit;
     }
 
+    public function isNotNull () : Bool
+    {
+        return !this._isOfType(NULL_TYPE, "");
+    }
+
     private function _isOfType(aType : TokenType, aValue : String) : Bool
     {
         return (type == aType && ("" == aValue || value.toLowerCase() == aValue));
