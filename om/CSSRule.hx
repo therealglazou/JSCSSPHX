@@ -21,6 +21,7 @@ class CSSRule implements DOMCSSRule {
         // should be overriden by subclasses but who knows, eh?
         switch (this.type) {
             case UNKNOWN_RULE:
+                return cast(this, CSSUnknownRule).cssText;
             case STYLE_RULE:
                 return cast(this, CSSStyleRule).cssText;
             case CHARSET_RULE:
@@ -49,6 +50,7 @@ class CSSRule implements DOMCSSRule {
         // should be overriden by subclasses but who knows, eh?
         switch (this.type) {
             case UNKNOWN_RULE:
+                return cast(this, CSSUnknownRule).cssText = v;
             case STYLE_RULE:
                 return cast(this, CSSStyleRule).cssText = v;
             case CHARSET_RULE:
