@@ -87,8 +87,8 @@ class CSSRule implements DOMCSSRule {
     public function new(aType : DOMCSSRuleType,
                         aSheet: DOMCSSStyleSheet,
                         aRule : DOMCSSRule) {
-        this.type = DOMCSSRuleType.UNKNOWN_RULE;
-        this.parentStyleSheet = null;
-        this.parentRule = null;
+        this.type = aType;
+        this.parentStyleSheet = aSheet;
+        this.parentRule = aRule;
    }
 }
