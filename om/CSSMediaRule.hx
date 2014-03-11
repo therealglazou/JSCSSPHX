@@ -3,6 +3,7 @@ package om;
 import om.interfaces.DOMCSSMediaRule;
 import om.interfaces.DOMMediaList;
 import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSRuleList;
 
 import om.MediaList;
 
@@ -14,19 +15,18 @@ class CSSMediaRule extends CSSRule
      */
 
     public var media(default, null) : DOMMediaList;
-    // var cssRules(default, null) : DOMCSSRuleList;
+    public var cssRules(default, null) : DOMCSSRuleList;
 
     /*
      * http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSMediaRule
      */
 
     public function insertRule(rule: String, index: UInt) : UInt {
-        /// TBD
-        return 0;
+        return cast(this.cssRules, CSSRuleList)._insertRule(rule, index);
     }
 
     public function deleteRule(index: UInt) : Void {
-        /// TBD
+        cast(this.cssRules, CSSRuleList)._deleteRule(index);
     }
 
     override function get_cssText() : String {

@@ -4,6 +4,8 @@ import om.interfaces.DOMStyleSheet;
 import om.interfaces.DOMCSSStyleSheet;
 import om.interfaces.DOMMediaList;
 import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSRuleList;
+import om.CSSRuleList;
 
 import om.MediaList;
 
@@ -34,15 +36,20 @@ class StyleSheet implements DOMStyleSheet
     /*
      * from DOMCSSStyleSheet interface
      */
+
     public var ownerRule(default, null) : DOMCSSRule;
+    public var cssRules(default, null) : DOMCSSRuleList;
+
+    /*
+     * http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSStyleSheet
+     */
 
     public function insertRule(rule: String, index: UInt) : UInt {
-        /// TBD
-        return 0;
+        return cast(this.cssRules, CSSRuleList)._insertRule(rule, index);
     }
 
     public function deleteRule(index: UInt) : Void {
-        /// TBD
+        cast(this.cssRules, CSSRuleList)._deleteRule(index);
     }
 
     /*
@@ -54,6 +61,7 @@ class StyleSheet implements DOMStyleSheet
         this.parentStyleSheet = null;
         this.href = "";
         this.title = "";
+        this.cssRules = new CSSRuleList();
         this.media = new MediaList();
     }
 }

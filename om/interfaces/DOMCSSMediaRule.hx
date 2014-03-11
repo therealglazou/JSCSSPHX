@@ -2,6 +2,7 @@ package om.interfaces;
 
 import om.interfaces.DOMMediaList;
 import om.interfaces.DOMCSSStyleSheet;
+import om.interfaces.DOMCSSRuleList;
 
 interface DOMCSSMediaRule {
 
@@ -13,7 +14,7 @@ interface DOMCSSMediaRule {
     /*
      * readonly attribute nsIDOMCSSRuleList cssRules;
      */
-    // var cssRules(default, null) : DOMCSSRuleList;
+    var cssRules(default, null) : DOMCSSRuleList;
 
     /*
      * unsigned long      insertRule(in DOMString rule,
