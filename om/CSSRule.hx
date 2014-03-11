@@ -32,6 +32,7 @@ class CSSRule implements DOMCSSRule {
             case FONT_FACE_RULE:
                 return cast(this, CSSFontFaceRule).cssText;
             case PAGE_RULE:
+                return cast(this, CSSPageRule).cssText;
             case KEYFRAMES_RULE:
             case KEYFRAME_RULE:
             case MOZ_KEYFRAMES_RULE:
@@ -58,6 +59,7 @@ class CSSRule implements DOMCSSRule {
             case FONT_FACE_RULE:
                 return cast(this, CSSFontFaceRule).cssText = v;
             case PAGE_RULE:
+                return cast(this, CSSPageRule).cssText = v;
             case KEYFRAMES_RULE:
             case KEYFRAME_RULE:
             case MOZ_KEYFRAMES_RULE:
