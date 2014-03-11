@@ -34,7 +34,9 @@ class CSSRule implements DOMCSSRule {
             case PAGE_RULE:
                 return cast(this, CSSPageRule).cssText;
             case KEYFRAMES_RULE:
+                return cast(this, CSSKeyframesRule).cssText;
             case KEYFRAME_RULE:
+                return cast(this, CSSKeyframeRule).cssText;
             case MOZ_KEYFRAMES_RULE:
             case MOZ_KEYFRAME_RULE:
             case NAMESPACE_RULE:
@@ -61,7 +63,9 @@ class CSSRule implements DOMCSSRule {
             case PAGE_RULE:
                 return cast(this, CSSPageRule).cssText = v;
             case KEYFRAMES_RULE:
+                return cast(this, CSSKeyframesRule).cssText = v;
             case KEYFRAME_RULE:
+                return cast(this, CSSKeyframeRule).cssText = v;
             case MOZ_KEYFRAMES_RULE:
             case MOZ_KEYFRAME_RULE:
             case NAMESPACE_RULE:
