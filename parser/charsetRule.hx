@@ -29,7 +29,7 @@
                 this.reportError(CHARSET_RULE_MISSING_WS);
         }
       
-        var rule = new CSSCharsetRule(s, CHARSET_RULE, aSheet, null);
+        var rule = new CSSUnknownRule(s, CHARSET_RULE, aSheet, null);
         aSheet._appendRule(rule);
         return false;
     }
