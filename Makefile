@@ -1,6 +1,11 @@
 DIRS += parser
 
 all::
-	rm parser/Parser.hx
+	rm -f parser/Parser.hx
 	cd parser && make
 	haxe -main JSCSSPTest -cpp cpp
+
+js::
+	rm -f parser/Parser.hx
+	cd parser && make
+	haxe -main JSCSSPTest -js JSCSSP.js
