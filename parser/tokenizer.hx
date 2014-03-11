@@ -1,7 +1,7 @@
 
-    var mScanner : Scanner;
-    var mToken : Token;
-    var mLookAhead : Token;
+    /*
+     * TOKENIZATION
+     */
 
     public function currentToken() : Token {
         return mToken;

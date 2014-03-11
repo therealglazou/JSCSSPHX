@@ -2,8 +2,9 @@ package om;
 
 import om.interfaces.DOMCSSMediaRule;
 import om.interfaces.DOMMediaList;
-import om.interfaces.DOMCSSRule;
 import om.interfaces.DOMCSSRuleList;
+import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSStyleSheet;
 
 import om.MediaList;
 
@@ -50,8 +51,10 @@ class CSSMediaRule extends CSSRule
     /*
      * CONSTRUCTOR
      */
-    public function new() {
-        super();
+    public function new(aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
         this.media = new MediaList();
     }
 }

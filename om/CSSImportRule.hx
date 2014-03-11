@@ -2,6 +2,7 @@ package om;
 
 import om.interfaces.DOMCSSImportRule;
 import om.interfaces.DOMMediaList;
+import om.interfaces.DOMCSSRule;
 import om.interfaces.DOMCSSStyleSheet;
 
 class CSSImportRule extends CSSRule
@@ -32,10 +33,13 @@ class CSSImportRule extends CSSRule
      * CONSTRUCTOR
      */
 
-    public function new() {
-        super();
-        this.href = "";
+    public function new(aHref : String,
+                        aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
+        this.href = aHref;
         this.media = new MediaList();
-        this.styleSheet = null;
+        this.styleSheet = new StyleSheet();
     }
 }

@@ -1,6 +1,8 @@
 package om;
 
 import om.interfaces.DOMCSSUnknownRule;
+import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSStyleSheet;
 
 class CSSUnknownRule extends CSSRule
                      implements DOMCSSUnknownRule {
@@ -22,5 +24,13 @@ class CSSUnknownRule extends CSSRule
         // TBD when parsing and om are done
         // XXX what happens if parsing makes the rule valid again???
         return v;
+    }
+
+    public function new(aData : String,
+                        aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
+        this.data = aData;
     }
 }

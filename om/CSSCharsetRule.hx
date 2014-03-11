@@ -1,6 +1,8 @@
 package om;
 
 import om.interfaces.DOMCSSCharsetRule;
+import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSStyleSheet;
 
 class CSSCharsetRule extends CSSRule
                      implements DOMCSSCharsetRule {
@@ -33,8 +35,11 @@ class CSSCharsetRule extends CSSRule
      * CONSTRUCTOR
      */
 
-    public function new() {
-        super();
-        this.encoding = "UTF-8";
+    public function new(aEncoding : String,
+                        aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
+        this.encoding = aEncoding;
     }
 }

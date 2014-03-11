@@ -3,6 +3,8 @@ package om;
 import om.CSSStyleDeclaration;
 import om.interfaces.DOMCSSFontFaceRule;
 import om.interfaces.DOMCSSStyleDeclaration;
+import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSStyleSheet;
 
 class CSSFontFaceRule extends CSSRule
                    implements DOMCSSFontFaceRule {
@@ -30,8 +32,10 @@ class CSSFontFaceRule extends CSSRule
     /*
      * CONSTRUCTOR
      */
-    public function new() {
-        super();
+    public function new(aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
         this.style = new CSSStyleDeclaration();
     }
 }

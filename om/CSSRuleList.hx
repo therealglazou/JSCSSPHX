@@ -36,6 +36,10 @@ class CSSRuleList implements DOMCSSRuleList {
         return 0;
     }
 
+    public function _appendRule(rule : DOMCSSRule) : Void {
+        this.mRules.push(rule);
+    }
+
     public function _deleteRule(index: UInt) : Void {
         if (index >= this.mRules.length)
             throw INDEX_SIZE_ERR;

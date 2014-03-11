@@ -3,6 +3,8 @@ package om;
 import om.CSSStyleDeclaration;
 import om.interfaces.DOMCSSKeyframeRule;
 import om.interfaces.DOMCSSStyleDeclaration;
+import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSStyleSheet;
 
 class CSSKeyframeRule extends CSSRule
                    implements DOMCSSKeyframeRule {
@@ -30,9 +32,12 @@ class CSSKeyframeRule extends CSSRule
     /*
      * CONSTRUCTOR
      */
-    public function new() {
-        super();
-        this.keyText = "";
+    public function new(aKey : String,
+                        aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
+        this.keyText = aKey;
         this.style = new CSSStyleDeclaration();
     }
 }

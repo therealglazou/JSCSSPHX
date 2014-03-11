@@ -53,6 +53,14 @@ class StyleSheet implements DOMStyleSheet
     }
 
     /*
+     * PROPRIETARY
+     */
+    
+    public function _appendRule(rule : CSSRule) : Void {
+        cast(this.cssRules, CSSRuleList)._appendRule(rule);
+    }
+
+    /*
      * CONSTRUCTOR
      */
     public function new() {

@@ -14,6 +14,11 @@ class CSSRule implements DOMCSSRule {
     public var parentRule(default, null) : DOMCSSRule;
 
     /*
+     * PROPRIETARY
+     */
+    public var parsedCssText : String;
+
+    /*
      * http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSRule
      */
 
@@ -79,7 +84,9 @@ class CSSRule implements DOMCSSRule {
      * CONSTRUCTOR
      */
 
-    public function new() {
+    public function new(aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
         this.type = DOMCSSRuleType.UNKNOWN_RULE;
         this.parentStyleSheet = null;
         this.parentRule = null;

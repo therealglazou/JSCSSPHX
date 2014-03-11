@@ -1,6 +1,8 @@
 package om;
 
 import om.interfaces.DOMCSSNamespaceRule;
+import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSStyleSheet;
 
 class CSSNamespaceRule extends CSSRule
                        implements DOMCSSNamespaceRule {
@@ -32,8 +34,12 @@ class CSSNamespaceRule extends CSSRule
     /*
      * CONSTRUCTOR
      */
-    public function new() {
-        super();
+    public function new(aURI : String,
+                        aPrefix : String,
+                        aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
         this.namespaceURI = "";
         this.prefix = "";
     }

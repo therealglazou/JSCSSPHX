@@ -25,9 +25,9 @@ enum TokenType {
 class Token {
 
 
-    var type : TokenType;
-    var value : Dynamic;
-    var unit : String;
+    public var type : TokenType;
+    public var value : Dynamic;
+    public var unit : String;
 
     public function new(aType : TokenType, aValue : Dynamic, aUnit: String) {
         type = aType;

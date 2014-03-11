@@ -2,8 +2,9 @@ package om;
 
 import om.interfaces.DOMCSSKeyframesRule;
 import om.interfaces.DOMCSSKeyframeRule;
-import om.interfaces.DOMCSSRule;
 import om.interfaces.DOMCSSRuleList;
+import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSStyleSheet;
 
 class CSSKeyframesRule extends CSSRule
                        implements DOMCSSKeyframesRule {
@@ -58,8 +59,12 @@ class CSSKeyframesRule extends CSSRule
     /*
      * CONSTRUCTOR
      */
-    public function new() {
-        super();
+    public function new(aName : String,
+                        aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
+        this.name = aName;
         this.cssRules = new CSSRuleList();
     }
 }

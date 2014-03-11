@@ -6,6 +6,7 @@ TARGET=Parser.hx
 FILES=main.hx \
 	tokenizer.hx \
 	charsetRule.hx \
+	error.hx \
 	$(NULL)
 
 all:

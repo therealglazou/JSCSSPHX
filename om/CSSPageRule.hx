@@ -3,6 +3,8 @@ package om;
 import om.CSSStyleDeclaration;
 import om.interfaces.DOMCSSPageRule;
 import om.interfaces.DOMCSSStyleDeclaration;
+import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSStyleSheet;
 
 class CSSPageRule extends CSSRule
                   implements DOMCSSPageRule {
@@ -36,9 +38,12 @@ class CSSPageRule extends CSSRule
     /*
      * CONSTRUCTOR
      */
-    public function new() {
-        super();
-        this.selectorText = "";
+    public function new(aSelectorText : String,
+                        aType : DOMCSSRuleType,
+                        aSheet: DOMCSSStyleSheet,
+                        aRule : DOMCSSRule) {
+        super(aType, aSheet, aRule);
+        this.selectorText = aSelectorText;
         this.style = new CSSStyleDeclaration();
     }
 }
