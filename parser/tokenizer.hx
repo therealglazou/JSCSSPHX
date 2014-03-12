@@ -36,3 +36,22 @@
 
         return token;
     }
+
+    public function preserveState() {
+        this.mPreservedTokens.push(this.currentToken());
+        this.mScanner.preserveState();
+    }
+
+    public function restoreState() {
+        if (0 != this.mPreservedTokens.length) {
+            this.mScanner.restoreState();
+            this.mToken = this.mPreservedTokens.pop();
+        }
+    }
+
+    public function forgetState() {
+        if (0 != this.mPreservedTokens.length) {
+            this.mScanner.forgetState();
+            this.mPreservedTokens.pop();
+        }
+    }

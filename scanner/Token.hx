@@ -37,26 +37,26 @@ class Token {
 
     public function isNotNull () : Bool
     {
-        return !this._isOfType(NULL_TYPE, "");
+        return !this._isOfType(NULL_TYPE);
     }
 
-    private function _isOfType(aType : TokenType, aValue : String) : Bool
+    private function _isOfType(aType : TokenType, ?aValue : String="") : Bool
     {
         return (type == aType && ("" == aValue || value.toLowerCase() == aValue));
     }
 
-    public function isWhiteSpace(?w : String) : Bool {
+    public function isWhiteSpace(?w : String="") : Bool {
         return _isOfType(WHITESPACE_TYPE, w);
     }
 
     public function isString() : Bool
     {
-        return _isOfType(STRING_TYPE, "");
+        return _isOfType(STRING_TYPE);
     }
 
     public function isComment() : Bool
     {
-        return _isOfType(COMMENT_TYPE, "");
+        return _isOfType(COMMENT_TYPE);
     }
 
     public function isNumber(n) : Bool
@@ -64,12 +64,12 @@ class Token {
         return _isOfType(NUMBER_TYPE, n);
     }
 
-    public function isIdent(i) : Bool
+    public function isIdent(i : String="") : Bool
     {
         return _isOfType(IDENT_TYPE, i);
     }
 
-    public function isFunction(f) : Bool
+    public function isFunction(f : String="") : Bool
     {
         return _isOfType(FUNCTION_TYPE, f);
     }
@@ -81,27 +81,27 @@ class Token {
 
     public function isIncludes() : Bool
     {
-        return _isOfType(INCLUDES_TYPE, "");
+        return _isOfType(INCLUDES_TYPE);
     }
 
     public function isDashmatch() : Bool
     {
-        return _isOfType(DASHMATCH_TYPE, "");
+        return _isOfType(DASHMATCH_TYPE);
     }
 
     public function isBeginsmatch() : Bool
     {
-        return _isOfType(BEGINSMATCH_TYPE, "");
+        return _isOfType(BEGINSMATCH_TYPE);
     }
 
     public function isEndsmatch() : Bool
     {
-        return _isOfType(ENDSMATCH_TYPE, "");
+        return _isOfType(ENDSMATCH_TYPE);
     }
 
     public function isContainsmatch() : Bool
     {
-        return _isOfType(CONTAINSMATCH_TYPE, "");
+        return _isOfType(CONTAINSMATCH_TYPE);
     }
 
     public function isSymbol(c) : Bool
@@ -111,17 +111,17 @@ class Token {
 
     public function isDimension() : Bool
     {
-        return _isOfType(DIMENSION_TYPE, "");
+        return _isOfType(DIMENSION_TYPE);
     }
 
     public function isPercentage() : Bool
     {
-        return _isOfType(PERCENTAGE_TYPE, "");
+        return _isOfType(PERCENTAGE_TYPE);
     }
 
     public function isHex() : Bool
     {
-        return _isOfType(HEX_TYPE, "");
+        return _isOfType(HEX_TYPE);
     }
 
     public function isDimensionOfUnit(aUnit) : Bool

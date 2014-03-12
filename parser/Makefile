@@ -7,6 +7,12 @@ FILES=main.hx \
 	tokenizer.hx \
 	charsetRule.hx \
 	error.hx \
+	whitespace.hx \
+	comment.hx \
+	importRule.hx \
+	url.hx \
+	unknownRule.hx \
+	namespaceRule.hx \
 	$(NULL)
 
 all:
