@@ -22,7 +22,7 @@ class CSSNamespaceRule extends CSSRule
         var rv ="@namespace ";
         if (this.prefix != "")
             rv += this.prefix + " ";
-        rv += "url(\"" + this.namespaceURI + "\");";
+        rv += this.namespaceURI + ";";
         return rv;
     }
 
@@ -40,7 +40,7 @@ class CSSNamespaceRule extends CSSRule
                         aSheet: DOMCSSStyleSheet,
                         aRule : DOMCSSRule) {
         super(aType, aSheet, aRule);
-        this.namespaceURI = "";
-        this.prefix = "";
+        this.namespaceURI = aURI;
+        this.prefix = aPrefix;
     }
 }

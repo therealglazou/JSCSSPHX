@@ -53,7 +53,7 @@
         }
         
         this.restoreState();
-        this.addUnknownAtRule(aSheet, "@import");
+        this.addUnknownAtRule(aSheet, null, "@import");
         return false;
     };
     

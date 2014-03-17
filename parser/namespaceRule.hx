@@ -43,7 +43,7 @@
             
         }
         this.restoreState();
-        this.addUnknownAtRule(aSheet, "@namespace");
+        this.addUnknownAtRule(aSheet, null, "@namespace");
         return false;
     };
     

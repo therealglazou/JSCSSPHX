@@ -16,6 +16,24 @@ enum ParserError {
     NAMESPACE_RULE_POSITION;
 }
 
+typedef SelectorSpecificity = {
+    var a : UInt;
+    var b : UInt;
+    var c : UInt;
+    var d : UInt;
+}
+
+typedef Selector = {
+    var selector : String;
+    var specificity : SelectorSpecificity;
+}
+
+typedef Declaration = {
+    var property : String;
+    var value : String;
+    var priority : String;
+}
+
 class Parser  {
 
     /*

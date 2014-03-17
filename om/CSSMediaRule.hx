@@ -49,6 +49,14 @@ class CSSMediaRule extends CSSRule
     }
 
     /*
+     * PROPRIETARY
+     */
+    
+    public function _appendRule(rule : CSSRule) : Void {
+        cast(this.cssRules, CSSRuleList)._appendRule(rule);
+    }
+
+    /*
      * CONSTRUCTOR
      */
     public function new(aType : DOMCSSRuleType,

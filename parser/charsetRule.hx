@@ -10,10 +10,11 @@
                 token = this.getToken(false, false);
                 s += token.value;
                 if (token.isString()) {
-                    var encoding = token.value;
+                    var encoding = token.value.substr(1, token.value.length - 2);
                     token = this.getToken(false, false);
                     s += token.value;
                     if (token.isSymbol(";")) {
+                        trace("ok");
                         var rule = new CSSCharsetRule(encoding, CHARSET_RULE, aSheet, null);
                         rule.parsedCssText = s;
                         aSheet._appendRule(rule);

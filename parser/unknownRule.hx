@@ -1,5 +1,5 @@
 
-    public function addUnknownAtRule(aSheet : StyleSheet, aString : String) : Void {
+    public function addUnknownAtRule(aSheet : StyleSheet, aRule: CSSRule, aString : String) : Void {
         var blocks = [];
         var token = this.getToken(false, false);
         while (token.isNotNull()) {
@@ -28,13 +28,16 @@
             token = this.getToken(false, false);
         }
         
-        this.addUnknownRule(aSheet, aString);
+        this.addUnknownRule(aSheet, aRule, aString);
     }
     
-    public function addUnknownRule(aSheet : StyleSheet, aString : String) {
+    public function addUnknownRule(aSheet : StyleSheet, aRule : CSSRule, aString : String) {
         var errorMsg = this.consumeError();
         var rule = new CSSUnknownRule(errorMsg, UNKNOWN_RULE, aSheet, null);
         rule.parsedCssText = aString;
-        aSheet._appendRule(rule);
+        if (null != aRule)
+            cast(aRule, CSSMediaRule)._appendRule(rule);
+        else
+            aSheet._appendRule(rule);
     }
     

@@ -13,6 +13,9 @@ FILES=main.hx \
 	url.hx \
 	unknownRule.hx \
 	namespaceRule.hx \
+	styleRule.hx \
+	declarations.hx \
+	selectors.hx \
 	$(NULL)
 
 all:
