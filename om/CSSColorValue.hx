@@ -21,10 +21,21 @@ class CSSColorValue implements DOMCSSColorValue {
     /*
      * from DOMCSSColorValue interface
      */
-    public var top(default, null)    : DOMCSSPrimitiveValue;
-    public var right(default, null)  : DOMCSSPrimitiveValue;
-    public var bottom(default, null) : DOMCSSPrimitiveValue;
-    public var left(default, null)   : DOMCSSPrimitiveValue;
+    public var red : Float;
+    public var green : Float;
+    public var blue : Float;
+
+    public var isRedPercentage : Bool;
+    public var isGreenPercentage : Bool;
+    public var isBluePercentage : Bool;
+
+    public var alphaValue : Float;
+
+    public var hue : Float;
+    public var saturation : Float;
+    public var lightness : Float;
+
+    public var isHSL : Bool;
     
     /*
     /*
@@ -32,10 +43,20 @@ class CSSColorValue implements DOMCSSColorValue {
      */
 
     public function get_cssText() : String {
-        return "rect(" + this.top.cssText + ", " +
-                         this.right.cssText + ", " +
-                         this.bottom.cssText + ", " +
-                         this.left.cssText + ")";
+        if (this.isHSL)
+            return "hsl" + (1 == this.alphaValue ? "" : "a") + "("
+                         + this.hue + ", "
+                         + this.saturation + "%, "
+                         + this.lightness + "%"
+                         + (1 == this.alphaValue ? "" : ", " + this.alphaValue)
+                         + ")";
+
+        return "rgb" + (1 == this.alphaValue ? "" : "a") + "("
+                     + this.red + (this.isRedPercentage ? "%" : "") + ", "
+                     + this.green + (this.isGreenPercentage ? "%" : "") + ", "
+                     + this.blue + (this.isBluePercentage ? "%" : "")
+                     + (1 == this.alphaValue ? "" : ", " + this.alphaValue)
+                      + ")";
     }
 
     public function set_cssText(v : String) : String {
@@ -68,7 +89,19 @@ class CSSColorValue implements DOMCSSColorValue {
     }
 
     public function new() {
-        this.primitiveType = CSS_RECT;
+        this.primitiveType = CSS_RGBCOLOR;
         this.cssValueType = CSS_PRIMITIVE_VALUE;
+
+        this.red = 0;
+        this.green = 0;
+        this.blue = 0;
+        
+        this.isRedPercentage = false;
+        this.isGreenPercentage = false;
+        this.isBluePercentage = false;
+
+        this.alphaValue = 1;
+
+        this.isHSL = false;
     }
 }
