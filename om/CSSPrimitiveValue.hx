@@ -62,8 +62,28 @@ class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
      */
 
     public function get_cssText() : String {
-        // TBD
-        return "";
+        switch (this.primitiveType) {
+            case CSS_NUMBER:
+                return Std.string(this.mFloatValue);
+            case CSS_PERCENTAGE:
+                return Std.string(this.mFloatValue) + "%";
+            case CSS_UNIT:
+                return Std.string(this.mFloatValue) + this.mUnit;
+            case CSS_STRING:
+                return this.mString;
+            case CSS_IDENT:
+                return this.mString;
+            case CSS_ATTR:
+                return "attr(" + this.mString + ")";
+            case CSS_URI:
+                return "url(" + this.mString + ")";
+            case CSS_RGBCOLOR:
+                return cast(this, CSSColorValue).cssText;
+
+            default:
+                return "";
+            
+        }
     }
 
     public function set_cssText(v : String) : String {
@@ -136,7 +156,8 @@ class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
 
     public function getRGBColorValue() : CSSColorValue {
         if (CSS_RGBCOLOR == this.primitiveType)
-          return cast(this, CSSColorValue);
+            return cast(this, CSSColorValue);
+        throw INVALID_ACCESS_ERR;
     }
 
     public function new(aPrimitiveType : PrimitiveType) {
