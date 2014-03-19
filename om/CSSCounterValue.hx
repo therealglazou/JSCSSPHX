@@ -120,7 +120,7 @@ class CSSCounterValue implements DOMCSSCounterValue {
     }
 
     public function new() {
-        this.primitiveType = CSS_RECT;
+        this.primitiveType = CSS_COUNTER;
         this.cssValueType = CSS_PRIMITIVE_VALUE;
 
         this.identifier = "";

@@ -135,6 +135,7 @@ class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
             case CSS_ATTR:
             case CSS_COUNTER:
             case CSS_VARIABLE:
+            case CSS_CALC:
                 return this.mString;
 
             default:
@@ -151,6 +152,7 @@ class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
             case CSS_ATTR:
             case CSS_COUNTER:
             case CSS_VARIABLE:
+            case CSS_CALC:
                 this.mString = stringValue;
 
             default:
