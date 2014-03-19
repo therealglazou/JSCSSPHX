@@ -79,6 +79,10 @@ class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
                 return "url(" + this.mString + ")";
             case CSS_RGBCOLOR:
                 return cast(this, CSSColorValue).cssText;
+            case CSS_RECT:
+                return cast(this, CSSRectValue).cssText;
+            case CSS_COUNTER:
+                return cast(this, CSSCounterValue).cssText;
 
             default:
                 return "";
