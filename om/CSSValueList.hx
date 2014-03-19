@@ -62,7 +62,7 @@ class CSSValueList implements DOMCSSValueList {
     public function get_cssText() : String {
         return this.mValueArray
                    .map(function(n) {return n.cssText; } )
-                   .join(", ");
+                   .join((this.commaSeparated ? ", " : " "));
     }
 
     public function set_cssText(v : String) : String {
