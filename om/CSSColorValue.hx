@@ -129,6 +129,10 @@ class CSSColorValue implements DOMCSSColorValue {
         return this;
     }
 
+    public function getRectValue() : CSSRectValue {
+        throw INVALID_ACCESS_ERR;
+    }
+
     public function new() {
         this.primitiveType = CSS_RGBCOLOR;
         this.cssValueType = CSS_PRIMITIVE_VALUE;

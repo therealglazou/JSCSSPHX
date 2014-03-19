@@ -39,11 +39,10 @@ package om;
 
 import om.interfaces.DOMCSSPrimitiveValue;
 import om.interfaces.DOMCSSValue;
+import om.interfaces.DOMCSSRectValue;
 import om.interfaces.DOMException;
 
-//import om.CSSColorValue;
-
-class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
+class CSSRectValue implements DOMCSSRectValue {
 
     /*
      * from DOMCSSValue interface
@@ -57,33 +56,23 @@ class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
     public var primitiveType(default, null) : PrimitiveType;
     
     /*
+     * from DOMCSSRectValue interface
+     */
+    public var top(default, null)    : DOMCSSPrimitiveValue;
+    public var right(default, null)  : DOMCSSPrimitiveValue;
+    public var bottom(default, null) : DOMCSSPrimitiveValue;
+    public var left(default, null)   : DOMCSSPrimitiveValue;
+    
+    /*
     /*
      * http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSValue
      */
 
     public function get_cssText() : String {
-        switch (this.primitiveType) {
-            case CSS_NUMBER:
-                return Std.string(this.mFloatValue);
-            case CSS_PERCENTAGE:
-                return Std.string(this.mFloatValue) + "%";
-            case CSS_UNIT:
-                return Std.string(this.mFloatValue) + this.mUnit;
-            case CSS_STRING:
-                return this.mString;
-            case CSS_IDENT:
-                return this.mString;
-            case CSS_ATTR:
-                return "attr(" + this.mString + ")";
-            case CSS_URI:
-                return "url(" + this.mString + ")";
-            case CSS_RGBCOLOR:
-                return cast(this, CSSColorValue).cssText;
-
-            default:
-                return "";
-            
-        }
+        return "rect(" + top.cssText + ", "
+                       + right.cssText + ", "
+                       + bottom.cssText + ", "
+                       + left.cssText + ")";
     }
 
     public function set_cssText(v : String) : String {
@@ -94,84 +83,37 @@ class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
     /*
      * http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSPrimitiveValue
      */
-    private var mUnit : String;
-    private var mFloatValue : Float; 
-    private var mString : String;
 
     public function setFloatValue(unit : String, floatValue : Float) : Void {
-        if (CSS_UNIT != this.primitiveType
-            && CSS_PERCENTAGE != this.primitiveType)
-            throw INVALID_ACCESS_ERR;
-
-        this.mUnit = unit;
-        this.mFloatValue = floatValue;
+        throw INVALID_ACCESS_ERR;
     }
 
     public function getFloatValue() : Float {
-        if (CSS_UNIT != this.primitiveType
-            && CSS_PERCENTAGE != this.primitiveType)
-            throw INVALID_ACCESS_ERR;
-
-        return this.mFloatValue;
+        throw INVALID_ACCESS_ERR;
     }
 
     public function getFloatUnit() : String {
-        if (CSS_UNIT != this.primitiveType
-            && CSS_PERCENTAGE != this.primitiveType)
-            throw INVALID_ACCESS_ERR;
-
-        return this.mUnit;
+        throw INVALID_ACCESS_ERR;
     }
 
     public function getStringValue() : String {
-        switch (this.primitiveType) {
-            case CSS_STRING:
-            case CSS_IDENT:
-            case CSS_URI:
-            case CSS_ATTR:
-            case CSS_COUNTER:
-            case CSS_VARIABLE:
-                return this.mString;
-
-            default:
-                throw INVALID_ACCESS_ERR;
-        }
-        return ""; // never matches
+        throw INVALID_ACCESS_ERR;
     }
 
     public function setStringValue(stringValue : String) : Void {
-        switch (this.primitiveType) {
-            case CSS_STRING:
-            case CSS_IDENT:
-            case CSS_URI:
-            case CSS_ATTR:
-            case CSS_COUNTER:
-            case CSS_VARIABLE:
-                this.mString = stringValue;
-
-            default:
-                throw INVALID_ACCESS_ERR;
-        }
+        throw INVALID_ACCESS_ERR;
     }
 
     public function getRGBColorValue() : CSSColorValue {
-        if (CSS_RGBCOLOR == this.primitiveType)
-            return cast(this, CSSColorValue);
         throw INVALID_ACCESS_ERR;
     }
 
     public function getRectValue() : CSSRectValue {
-        if (CSS_RECT == this.primitiveType)
-            return cast(this, CSSRectValue);
-        throw INVALID_ACCESS_ERR;
+        return this;
     }
 
-    public function new(aPrimitiveType : PrimitiveType) {
-        this.primitiveType = aPrimitiveType;
+    public function new() {
+        this.primitiveType = CSS_RECT;
         this.cssValueType = CSS_PRIMITIVE_VALUE;
-
-        this.mUnit = "";
-        this.mFloatValue = 0;
-        this.mString = "";
     }
 }
