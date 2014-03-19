@@ -37,20 +37,14 @@
 
 package om.interfaces;
 
-/*
- *   // UnitTypes
- *  const unsigned short      CSS_INHERIT                    = 0;
- *  const unsigned short      CSS_PRIMITIVE_VALUE            = 1;
- *  const unsigned short      CSS_VALUE_LIST                 = 2;
- *  const unsigned short      CSS_CUSTOM                     = 3;
- */
 enum CSSValueType {
-  CSS_INHERIT;
-  CSS_INITIAL;
-  CSS_PRIMITIVE_VALUE;
+  CSS_SYMBOL;
+  CSS_NUMBER;
+  CSS_UNIT;
+  CSS_STRING;
+  CSS_URI;
+  CSS_IDENT;
   CSS_VALUE_LIST;
-
-  // CSS_CUSTOM;
 }
 
 interface DOMCSSValue {
@@ -62,7 +56,66 @@ interface DOMCSSValue {
     var cssText(get, set) : String;
 
     /*
-     * readonly attribute unsigned short   cssValueType;
+     * readonly attribute unsigned short   type;
      */
-    var cssValueType(default, null) : CSSValueType;
+    var type(default, null) : CSSValueType;
+
+    /*
+     *          attribute boolean          commaSeparated;
+     */
+    var commaSeparated : Bool;
+
+    /*
+     * readonly attribute unsigned long    length;
+     */
+    var length(get, null) : UInt;
+
+    /*
+     * CSSValue           item(in unsigned long index);
+     *                                       raises(DOMException);
+     */
+    function item(index : UInt) : CSSValue;
+
+    /*
+     * void               setFloatValue(in float floatValue)
+     *                                       raises(DOMException);
+     */
+    function setFloatValue(floatValue : Float) : Void;
+
+    /*
+     * float              getFloatValue()
+     *                                       raises(DOMException);
+     */
+    function getFloatValue() : Float;
+
+    /*
+     * void               setStringValue(in DOMString stringValue)
+     *                                       raises(DOMException);
+     */
+    function setStringValue(stringValue : String) : Void;
+
+    /*
+     * DOMString          getStringValue()
+     *                                       raises(DOMException);
+     */
+    function getStringValue() : String;
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

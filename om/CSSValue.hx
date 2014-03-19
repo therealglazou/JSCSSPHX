@@ -46,36 +46,90 @@ class CSSValue implements DOMCSSValue {
      * from DOMCSSValue interface
      */
     public var cssText(get, set) : String;
-    public var cssValueType(default, null) : CSSValueType;
+    public var type(default, null) : CSSValueType;
+    public var commaSeparated : Bool;
+    public var length(get, null) : UInt;
 
     /*
     /*
      * http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSValue
      */
+    private var mString : String;
+    private var mFloat  : Float;
+    private var mValueArray : Array<CSSValue>;
+    
+    private function get_length() : UInt {
+        if (CSS_VALUE_LIST != this.type)
+            throw INVALID_ACCESS_ERR;
+        return this.mValueArray.length;
+    }
 
     public function get_cssText() : String {
-        switch (this.cssValueType) {
-            case CSS_INHERIT:
-                return "inherit";
-            case CSS_INITIAL:
-                return "initial";
-            case CSS_PRIMITIVE_VALUE:
-                return cast(this, CSSPrimitiveValue).cssText;
+        switch (this.type) {
+            case CSS_SYMBOL, CSS_STRING, CSS_IDENT:
+                return this.mString;
+            case CSS_URI:
+                return "url(\"" + this.mString + "\")";
+            case CSS_UNIT:
+                return Std.string(this.mFloat) + this.mString;
+            case CSS_NUMBER:
+                return Std.string(this.mFloat) + this.mString;
             case CSS_VALUE_LIST:
-                return cast(this, CSSValueList).cssText;
+                var rv =  this.mValueArray
+                           .map(function(n) {return n.cssText; } )
+                           .join((this.commaSeparated ? ", " : " "));
+                if ("" != this.mString)
+                  rv = this.mString + "(" + rv + ")";
+                return rv;
             default:
                 return ""; // should never happen
         }
     }
 
     public function set_cssText(v : String) : String {
-        throw NO_MODIFICATION_ALLOWED_ERR;
+        // TBD
+        return "";
+    }
+
+    public function item(index : UInt) : CSSValue {
+        if (CSS_VALUE_LIST != this.type)
+            throw INVALID_ACCESS_ERR;
+        if (index >= this.length)
+            return null;
+        return this.mValueArray[index];
+    }
+
+    public function getFloatValue() : Float {
+        if (CSS_UNIT != this.type && CSS_NUMBER != this.type)
+            throw INVALID_ACCESS_ERR;
+        return this.mFloat;
+    }
+
+    public function setFloatValue(floatValue : Float) : Void {
+        if (CSS_UNIT != this.type && CSS_NUMBER != this.type)
+            throw INVALID_ACCESS_ERR;
+        this.mFloat = floatValue;
+    }
+
+    public function getStringValue() : String {
+        if (CSS_UNIT == this.type || CSS_NUMBER == this.type)
+            throw INVALID_ACCESS_ERR;
+        return this.mString;
+    }
+
+    public function setStringValue(stringValue : String) : Void{
+        if (CSS_UNIT == this.type || CSS_NUMBER == this.type)
+            throw INVALID_ACCESS_ERR;
+        this.mString = stringValue;
     }
 
     /*
-     * CONSTRUCTORE
+     * CONSTRUCTOR
      */
-    public function new(aType : CSSValueType) {
-        this.cssValueType = aType;
+    public function new() {
+        this.type = CSS_NUMBER;
+        this.mString = "";
+        this.mFloat = 0;
+        this.mValueArray = [];
     }
 }

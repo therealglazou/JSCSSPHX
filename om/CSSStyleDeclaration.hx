@@ -39,6 +39,7 @@ package om;
 
 import om.interfaces.DOMCSSStyleDeclaration;
 import om.interfaces.DOMCSSRule;
+import om.interfaces.DOMCSSValue;
 
 class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
 
@@ -54,14 +55,14 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
      */
 
     private var mPropertyNameArray : Array<String>; 
-    private var mPropertyValueArray : Array<String>; 
+    private var mPropertyValueArray : Array<DOMCSSValue>; 
     private var mPropertyPriorityArray : Array<String>; 
 
     private function get_cssText() : String {
         var rv : String = "";
         for (i in 0...this.mPropertyNameArray.length - 1) {
             rv += ("" != rv) ? " " : "";
-            rv += this.mPropertyNameArray[i] + ": " + this.mPropertyValueArray[i];
+            rv += this.mPropertyNameArray[i] + ": " + this.mPropertyValueArray[i].cssText;
             if ("" != this.mPropertyPriorityArray[i])
                 rv += " !important";
             rv += ";";
@@ -82,7 +83,7 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
         var index = this.mPropertyNameArray.indexOf(propertyName);
         if (-1 == index)
             return "";
-        return this.mPropertyValueArray[index];
+        return this.mPropertyValueArray[index].cssText;
     }
 
     public function getPropertyPriority(propertyName : String) : String {
@@ -97,7 +98,7 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
         var index = this.mPropertyNameArray.indexOf(propertyName);
         if (-1 == index)
             return "";
-        var value = this.mPropertyValueArray[index];
+        var value = this.mPropertyValueArray[index].cssText;
         this.mPropertyNameArray.splice(index, 1);
         this.mPropertyValueArray.splice(index, 1);
         this.mPropertyPriorityArray.splice(index, 1);
@@ -110,14 +111,16 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
         // TBD validate value when parsing and om are done
         // TBD deal with shorthands
         var index = this.mPropertyNameArray.indexOf(propertyName);
+        var cssValue = new CSSValue();
+        cssValue.cssText = value;
         if (-1 == index) {
             this.mPropertyNameArray.push(propertyName);
-            this.mPropertyValueArray.push(value);
+            this.mPropertyValueArray.push(cssValue);
             this.mPropertyPriorityArray.push(priority);
         }
         else {
             this.mPropertyNameArray[index] = propertyName;
-            this.mPropertyValueArray[index] = value;
+            this.mPropertyValueArray[index] = cssValue;
             this.mPropertyPriorityArray[index] = priority;
         }
     }
