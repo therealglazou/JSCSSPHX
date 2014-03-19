@@ -166,6 +166,12 @@ class CSSPrimitiveValue implements DOMCSSPrimitiveValue {
         throw INVALID_ACCESS_ERR;
     }
 
+    public function getCounterValue() : CSSCounterValue {
+        if (CSS_COUNTER == this.primitiveType)
+            return cast(this, CSSCounterValue);
+        throw INVALID_ACCESS_ERR;
+    }
+
     public function new(aPrimitiveType : PrimitiveType) {
         this.primitiveType = aPrimitiveType;
         this.cssValueType = CSS_PRIMITIVE_VALUE;

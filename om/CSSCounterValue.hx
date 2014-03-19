@@ -39,10 +39,10 @@ package om;
 
 import om.interfaces.DOMCSSPrimitiveValue;
 import om.interfaces.DOMCSSValue;
-import om.interfaces.DOMCSSColorValue;
+import om.interfaces.DOMCSSCounterValue;
 import om.interfaces.DOMException;
 
-class CSSColorValue implements DOMCSSColorValue {
+class CSSCounterValue implements DOMCSSCounterValue {
 
     /*
      * from DOMCSSValue interface
@@ -56,23 +56,12 @@ class CSSColorValue implements DOMCSSColorValue {
     public var primitiveType(default, null) : PrimitiveType;
     
     /*
-     * from DOMCSSColorValue interface
+     * from DOMCSSCounterValue interface
      */
-    public var red : Float;
-    public var green : Float;
-    public var blue : Float;
-
-    public var isRedPercentage : Bool;
-    public var isGreenPercentage : Bool;
-    public var isBluePercentage : Bool;
-
-    public var alphaValue : Float;
-
-    public var hue : Float;
-    public var saturation : Float;
-    public var lightness : Float;
-
-    public var isHSL : Bool;
+    public var identifier(default, null) : String;
+    public var listStyle(default, null) : String;
+    public var separator(default, null) : String;
+    public var nestedCounters(default, null) : Bool;
     
     /*
     /*
@@ -80,20 +69,13 @@ class CSSColorValue implements DOMCSSColorValue {
      */
 
     public function get_cssText() : String {
-        if (this.isHSL)
-            return "hsl" + (1 == this.alphaValue ? "" : "a") + "("
-                         + this.hue + ", "
-                         + this.saturation + "%, "
-                         + this.lightness + "%"
-                         + (1 == this.alphaValue ? "" : ", " + this.alphaValue)
-                         + ")";
-
-        return "rgb" + (1 == this.alphaValue ? "" : "a") + "("
-                     + this.red + (this.isRedPercentage ? "%" : "") + ", "
-                     + this.green + (this.isGreenPercentage ? "%" : "") + ", "
-                     + this.blue + (this.isBluePercentage ? "%" : "")
-                     + (1 == this.alphaValue ? "" : ", " + this.alphaValue)
-                      + ")";
+        var rv = (this.nestedCounters ? "counters" : "counter");
+        rv += "(" + this.identifier;
+        if (this.nestedCounters)
+            rv += ", \"" + this.separator + "\"";
+        if ("" != this.listStyle)
+            rv += ", " + this.separator + ")";
+        return rv;
     }
 
     public function set_cssText(v : String) : String {
@@ -126,7 +108,7 @@ class CSSColorValue implements DOMCSSColorValue {
     }
 
     public function getRGBColorValue() : CSSColorValue {
-        return this;
+        throw INVALID_ACCESS_ERR;
     }
 
     public function getRectValue() : CSSRectValue {
@@ -134,23 +116,16 @@ class CSSColorValue implements DOMCSSColorValue {
     }
 
     public function getCounterValue() : CSSCounterValue {
-        throw INVALID_ACCESS_ERR;
+        return this;
     }
 
     public function new() {
-        this.primitiveType = CSS_RGBCOLOR;
+        this.primitiveType = CSS_RECT;
         this.cssValueType = CSS_PRIMITIVE_VALUE;
 
-        this.red = 0;
-        this.green = 0;
-        this.blue = 0;
-        
-        this.isRedPercentage = false;
-        this.isGreenPercentage = false;
-        this.isBluePercentage = false;
-
-        this.alphaValue = 1;
-
-        this.isHSL = false;
+        this.identifier = "";
+        this.listStyle = "";
+        this.separator = "";
+        this.nestedCounters = false;
     }
 }

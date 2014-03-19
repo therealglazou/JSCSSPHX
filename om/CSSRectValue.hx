@@ -112,6 +112,10 @@ class CSSRectValue implements DOMCSSRectValue {
         return this;
     }
 
+    public function getCounterValue() : CSSCounterValue {
+        throw INVALID_ACCESS_ERR;
+    }
+
     public function new() {
         this.primitiveType = CSS_RECT;
         this.cssValueType = CSS_PRIMITIVE_VALUE;
