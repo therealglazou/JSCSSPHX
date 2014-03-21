@@ -44,6 +44,7 @@ enum CSSValueType {
   CSS_STRING;
   CSS_URI;
   CSS_IDENT;
+  CSS_HEX_COLOR;
   CSS_VALUE_LIST;
 }
 

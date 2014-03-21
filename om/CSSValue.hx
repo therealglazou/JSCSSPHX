@@ -68,6 +68,8 @@ class CSSValue implements DOMCSSValue {
         switch (this.type) {
             case CSS_SYMBOL, CSS_STRING, CSS_IDENT:
                 return this.mString;
+            case CSS_HEX_COLOR:
+                return "#" + this.mString;
             case CSS_URI:
                 return "url(\"" + this.mString + "\")";
             case CSS_UNIT:
@@ -124,10 +126,16 @@ class CSSValue implements DOMCSSValue {
     }
 
     /*
+     * EXTRAS
+     */
+    public var parentValue : CSSValue;
+
+    /*
      * CONSTRUCTOR
      */
-    public function new() {
-        this.type = CSS_NUMBER;
+    public function new(aType: CSSValueType, ?aParentValue : CSSValue=null) {
+        this.type = aType;
+        this.parentValue = aParentValue;
         this.mString = "";
         this.mFloat = 0;
         this.mValueArray = [];
