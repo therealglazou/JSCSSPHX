@@ -59,9 +59,14 @@ class Token {
         return _isOfType(COMMENT_TYPE);
     }
 
-    public function isNumber(n) : Bool
+    public function isNumber() : Bool
     {
-        return _isOfType(NUMBER_TYPE, n);
+        return _isOfType(NUMBER_TYPE);
+    }
+
+    public function isZero() : Bool
+    {
+        return _isOfType(NUMBER_TYPE, "0");
     }
 
     public function isIdent(i : String="") : Bool
@@ -104,7 +109,7 @@ class Token {
         return _isOfType(CONTAINSMATCH_TYPE);
     }
 
-    public function isSymbol(c) : Bool
+    public function isSymbol(?c : String="") : Bool
     {
         return _isOfType(SYMBOL_TYPE, c);
     }

@@ -135,7 +135,7 @@ class Scanner {
         mPos--;
     }
 
-    function nextHexValue() : Token {
+    public function nextHexValue() : Token {
         var c = read();
         if (c == "" || !isHexDigit(c))
             return new Token(NULL_TYPE, null, "");
@@ -258,11 +258,9 @@ class Scanner {
     
         if (c != "" && startsWithIdent(c, peek())) { // DIMENSION
             var unit = gatherIdent(c);
-            s += unit;
             return new Token(DIMENSION_TYPE, s, unit);
         }
         else if (c == "%") {
-            s += "%";
             return new Token(PERCENTAGE_TYPE, s, "");
         }
         else if (c != "")
