@@ -48,10 +48,10 @@ class CSSPseudoClass implements DOMCSSPseudoClass {
     public function isPseudoElement() : Bool {
         if (name == "after" ||
             name == "before" ||
-			name == "first-line" ||
-			name == "first-letter")
-			return true;
-		return false;
+            name == "first-line" ||
+            name == "first-letter")
+            return true;
+        return false;
     }
 }
 
@@ -68,7 +68,6 @@ class CSSSelector implements DOMCSSSelector {
     public var parent : DOMCSSSelector;
 
     public var next : DOMCSSSelector;
-    public var pseudoElement : String;
 
     // do we want namespaces here? not sure we need it
 
@@ -79,35 +78,49 @@ class CSSSelector implements DOMCSSSelector {
         var specificity : DOMCSSSelectorSpecificity = {a: 0, b:0, c:0, d:0 };
         var s = this;
         while (null != s) {
+            // Selectors Level 4 section 15
             specificity.a += s.IDList.length;
             specificity.b += s.ClassList.length + s.AttrList.length;
             if (s.elementType != "*")
                 specificity.c += 1;
             for (i in 0...s.PseudoClassList.length-1) {
                 var p = cast(s.PseudoClassList[i], CSSPseudoClass);
-				if (p.isPseudoElement())
-					specificity.c += 1;
-				else
-					specificity.b += 1;
+                if (p.isPseudoElement())
+                    specificity.c += 1;
+                else
+                    specificity.b += 1;
             }
 
-			if (null != s.negations) {
-	            specificity.a += s.negations.IDList.length;
-	            specificity.b += s.negations.ClassList.length + s.negations.AttrList.length;
-	            if (s.negations.elementType != "*")
-	                specificity.c += 1;
-	            for (i in 0...s.negations.PseudoClassList.length-1) {
-	                var p = cast(s.negations.PseudoClassList[i], CSSPseudoClass);
-					if (p.isPseudoElement())
-						specificity.c += 1;
-					else
-						specificity.b += 1;
-	            }
-			}
+            if (null != s.negations) {
+                // :not() itself is not counted, only the argument matters
+                specificity.a += s.negations.IDList.length;
+                specificity.b += s.negations.ClassList.length + s.negations.AttrList.length;
+                if (s.negations.elementType != "*")
+                    specificity.c += 1;
+                for (i in 0...s.negations.PseudoClassList.length-1) {
+                    var p = cast(s.negations.PseudoClassList[i], CSSPseudoClass);
+                    if (p.isPseudoElement())
+                        specificity.c += 1;
+                    else
+                        specificity.b += 1;
+                }
+            }
 
             s = cast(s.parent, CSSSelector);
         }
 
         return specificity;
+    }
+
+    public function new() {
+        this.elementType = "*";
+        this.IDList = [];
+        this.ClassList = [];
+        this.AttrList = [];
+        this.PseudoClassList = [];
+        this.negations = null;
+        this.parent = null;
+        this.next = null;
+        this.combinator = COMBINATOR_DESCENDANT;
     }
 }

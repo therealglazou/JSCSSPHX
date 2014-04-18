@@ -45,52 +45,52 @@ typedef DOMCSSSelectorSpecificity = {
 }
 
 enum DOMCSSAttrSelectorFunction {
-	ATTR_EXISTS;
-	ATTR_EQUALS;
-	ATTR_INCLUDES;
-	ATTR_DASHMATCH;
-	ATTR_BEGINSMATCH;
-	ATTR_ENDSMATCH;
-	ATTR_CONTAINSMATCH;
+    ATTR_EXISTS;
+    ATTR_EQUALS;
+    ATTR_INCLUDES;
+    ATTR_DASHMATCH;
+    ATTR_BEGINSMATCH;
+    ATTR_ENDSMATCH;
+    ATTR_CONTAINSMATCH;
 }
 
 interface DOMCSSAttrSelector {
-	var name : String;
-	var value : String;
-	var caseSensitive : Bool;
-	var operator : DOMCSSAttrSelectorFunction;
+    var name : String;
+    var value : String;
+    var caseSensitive : Bool;
+    var operator : DOMCSSAttrSelectorFunction;
 }
 
 interface DOMCSSPseudoClass {
-	var name : String;
+    var name : String;
 
-	var aguments : Array<DOMCSSValue>;
+    var aguments : Array<DOMCSSValue>;
+
+    function isPseudoElement() : Bool;
 }
 
 enum DOMCSSCombinator {
-	COMBINATOR_DESCENDANT;
-	COMBINATOR_CHILD;
-	COMBINATOR_ADJACENT_SIBLING;
-	COMBINATOR_SIBLING;
+    COMBINATOR_DESCENDANT;
+    COMBINATOR_CHILD;
+    COMBINATOR_ADJACENT_SIBLING;
+    COMBINATOR_SIBLING;
 }
 
 interface DOMCSSSelector {
 
-	var elementType : String; // could become an Atom
-	var IDList : Array<String>;
-	var ClassList : Array<String>;
+    var elementType : String; // could become an Atom
+    var IDList : Array<String>;
+    var ClassList : Array<String>;
 
-	var AttrList : Array<DOMCSSAttrSelector>;
-	var PseudoClassList : Array<DOMCSSPseudoClass>;
+    var AttrList : Array<DOMCSSAttrSelector>;
+    var PseudoClassList : Array<DOMCSSPseudoClass>;
 
-	var negations : DOMCSSSelector;
-	var next : DOMCSSSelector;
+    var negations : DOMCSSSelector;
+    var next : DOMCSSSelector;
 
-	var pseudoElement : String;
+    // do we want namespaces here? not sure we need it
 
-	// do we want namespaces here? not sure we need it
+    var combinator : DOMCSSCombinator;
 
-	var combinator : DOMCSSCombinator;
-
-	var specificity(get, null) : DOMCSSSelectorSpecificity;
+    var specificity(get, null) : DOMCSSSelectorSpecificity;
 }
