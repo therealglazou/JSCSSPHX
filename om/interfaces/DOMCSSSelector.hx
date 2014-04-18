@@ -86,6 +86,8 @@ interface DOMCSSSelector {
 	var negations : DOMCSSSelector;
 	var next : DOMCSSSelector;
 
+	var pseudoElement : String;
+
 	// do we want namespaces here? not sure we need it
 
 	var combinator : DOMCSSCombinator;
