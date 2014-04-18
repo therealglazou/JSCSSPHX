@@ -37,6 +37,13 @@
 
 package om.interfaces;
 
+typedef DOMCSSSelectorSpecificity = {
+    var a : UInt;
+    var b : UInt;
+    var c : UInt;
+    var d : UInt;
+}
+
 enum DOMCSSAttrSelectorFunction {
 	ATTR_EXISTS;
 	ATTR_EQUALS;
@@ -60,6 +67,13 @@ interface DOMCSSPseudoClass {
 	var aguments : Array<DOMCSSValue>;
 }
 
+enum DOMCSSCombinator {
+	COMBINATOR_DESCENDANT;
+	COMBINATOR_CHILD;
+	COMBINATOR_ADJACENT_SIBLING;
+	COMBINATOR_SIBLING;
+}
+
 interface DOMCSSSelector {
 
 	var elementType : String; // could become an Atom
@@ -74,5 +88,7 @@ interface DOMCSSSelector {
 
 	// do we want namespaces here? not sure we need it
 
-	var combinator : String; // could become an Atom
+	var combinator : DOMCSSCombinator;
+
+	var specificity(get, null) : DOMCSSSelectorSpecificity;
 }
