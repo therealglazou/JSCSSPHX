@@ -35,40 +35,19 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package om.interfaces;
+package om;
 
-typedef DOMCSSSelectorSpecificity = {
-    var a : UInt;
-    var b : UInt;
-    var c : UInt;
-    var d : UInt;
-}
+import om.interfaces.DOMCSSAttrSelector;
 
-enum DOMCSSCombinator {
-    COMBINATOR_NONE;
-    COMBINATOR_DESCENDANT;
-    COMBINATOR_CHILD;
-    COMBINATOR_ADJACENT_SIBLING;
-    COMBINATOR_SIBLING;
-}
+class CSSAttrSelector implements DOMCSSAttrSelector {
+    public var name : String;
+    public var value : String;
+    public var caseSensitive : Bool;
+    public var operator : DOMCSSAttrSelectorFunction;
 
-interface DOMCSSSelector {
-
-    var elementType : String; // could become an Atom
-    var IDList : Array<String>;
-    var ClassList : Array<String>;
-
-    var AttrList : Array<DOMCSSAttrSelector>;
-    var PseudoClassList : Array<DOMCSSPseudoClass>;
-
-    var negations : DOMCSSSelector;
-    var parent : DOMCSSSelector;
-    var next : DOMCSSSelector;
-
-    // do we want namespaces here? not sure we need it
-
-    var combinator : DOMCSSCombinator;
-
-    var specificity(get, null) : DOMCSSSelectorSpecificity;
-    function hasPseudoElement() : Bool;
+    public function new() {
+        this.name = "";
+        this.value = "";
+        this.caseSensitive = false;
+    }
 }

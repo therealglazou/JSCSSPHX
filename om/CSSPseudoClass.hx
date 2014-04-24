@@ -35,40 +35,27 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package om.interfaces;
+package om;
 
-typedef DOMCSSSelectorSpecificity = {
-    var a : UInt;
-    var b : UInt;
-    var c : UInt;
-    var d : UInt;
-}
+import om.interfaces.DOMCSSPseudoClass;
+import om.interfaces.DOMCSSValue;
 
-enum DOMCSSCombinator {
-    COMBINATOR_NONE;
-    COMBINATOR_DESCENDANT;
-    COMBINATOR_CHILD;
-    COMBINATOR_ADJACENT_SIBLING;
-    COMBINATOR_SIBLING;
-}
+class CSSPseudoClass implements DOMCSSPseudoClass {
+    public var name : String;
 
-interface DOMCSSSelector {
+    public var arguments : Array<DOMCSSValue>;
 
-    var elementType : String; // could become an Atom
-    var IDList : Array<String>;
-    var ClassList : Array<String>;
+    public function isPseudoElement() : Bool {
+        if (name == "after" ||
+            name == "before" ||
+            name == "first-line" ||
+            name == "first-letter")
+            return true;
+        return false;
+    }
 
-    var AttrList : Array<DOMCSSAttrSelector>;
-    var PseudoClassList : Array<DOMCSSPseudoClass>;
-
-    var negations : DOMCSSSelector;
-    var parent : DOMCSSSelector;
-    var next : DOMCSSSelector;
-
-    // do we want namespaces here? not sure we need it
-
-    var combinator : DOMCSSCombinator;
-
-    var specificity(get, null) : DOMCSSSelectorSpecificity;
-    function hasPseudoElement() : Bool;
+    public function new() {
+        this.name = "";
+        this.arguments = [];
+    }
 }

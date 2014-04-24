@@ -37,38 +37,20 @@
 
 package om.interfaces;
 
-typedef DOMCSSSelectorSpecificity = {
-    var a : UInt;
-    var b : UInt;
-    var c : UInt;
-    var d : UInt;
+enum DOMCSSAttrSelectorFunction {
+    ATTR_EXISTS;
+    ATTR_EQUALS;
+    ATTR_INCLUDES;
+    ATTR_DASHMATCH;
+    ATTR_BEGINSMATCH;
+    ATTR_ENDSMATCH;
+    ATTR_CONTAINSMATCH;
 }
 
-enum DOMCSSCombinator {
-    COMBINATOR_NONE;
-    COMBINATOR_DESCENDANT;
-    COMBINATOR_CHILD;
-    COMBINATOR_ADJACENT_SIBLING;
-    COMBINATOR_SIBLING;
-}
 
-interface DOMCSSSelector {
-
-    var elementType : String; // could become an Atom
-    var IDList : Array<String>;
-    var ClassList : Array<String>;
-
-    var AttrList : Array<DOMCSSAttrSelector>;
-    var PseudoClassList : Array<DOMCSSPseudoClass>;
-
-    var negations : DOMCSSSelector;
-    var parent : DOMCSSSelector;
-    var next : DOMCSSSelector;
-
-    // do we want namespaces here? not sure we need it
-
-    var combinator : DOMCSSCombinator;
-
-    var specificity(get, null) : DOMCSSSelectorSpecificity;
-    function hasPseudoElement() : Bool;
+interface DOMCSSAttrSelector {
+    var name : String;
+    var value : String;
+    var caseSensitive : Bool;
+    var operator : DOMCSSAttrSelectorFunction;
 }

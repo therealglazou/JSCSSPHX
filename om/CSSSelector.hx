@@ -38,22 +38,8 @@
 package om;
 
 import om.interfaces.DOMCSSSelector;
-import om.interfaces.DOMCSSValue;
-
-class CSSPseudoClass implements DOMCSSPseudoClass {
-    public var name : String;
-
-    public var aguments : Array<DOMCSSValue>;
-
-    public function isPseudoElement() : Bool {
-        if (name == "after" ||
-            name == "before" ||
-            name == "first-line" ||
-            name == "first-letter")
-            return true;
-        return false;
-    }
-}
+import om.interfaces.DOMCSSPseudoClass;
+import om.interfaces.DOMCSSAttrSelector;
 
 class CSSSelector implements DOMCSSSelector {
 
@@ -112,6 +98,14 @@ class CSSSelector implements DOMCSSSelector {
         return specificity;
     }
 
+    public function hasPseudoElement() : Bool {
+        for (i in 0...this.PseudoClassList.length-1) {
+            if (this.PseudoClassList[i].isPseudoElement())
+                return true;
+        }
+        return false;
+    }
+
     public function new() {
         this.elementType = "*";
         this.IDList = [];
@@ -121,6 +115,6 @@ class CSSSelector implements DOMCSSSelector {
         this.negations = null;
         this.parent = null;
         this.next = null;
-        this.combinator = COMBINATOR_DESCENDANT;
+        this.combinator = COMBINATOR_NONE;
     }
 }
