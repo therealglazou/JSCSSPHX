@@ -45,13 +45,51 @@ class CSSPseudoClass implements DOMCSSPseudoClass {
 
     public var arguments : Array<DOMCSSValue>;
 
+    private var mPeudoElementList = [
+        "after",
+        "before",
+        "first-line",
+        "first-letter"
+    ];
+
+    private var mPeudoClassList = [
+        "hover",
+        "active",
+        "focus",
+        "enabled",
+        "disabled",
+        "checked",
+        "indeterminate",
+        "root",
+        "first-child",
+        "last-child",
+        "first-of-type",
+        "last-of-type",
+        "only-child",
+        "only-of-type",
+        "empty"
+    ];
+
+    private var mFunctionalPseudoClassList = [
+        "lang",
+        "nth-child",
+        "nth-last-child",
+        "nth-of-type",
+        "nth-last-of-type",
+        "not"
+    ];
+
+
     public function isPseudoElement() : Bool {
-        if (name == "after" ||
-            name == "before" ||
-            name == "first-line" ||
-            name == "first-letter")
-            return true;
-        return false;
+        return (-1 != this.mPeudoElementList.indexOf(this.name));
+    }
+
+    public function isPseudoClass() : Bool {
+        return (-1 != this.mPeudoClassList.indexOf(this.name));
+    }
+
+    public function isFunctionalPseudoClass() : Bool {
+        return (-1 != this.mFunctionalPseudoClassList.indexOf(this.name));
     }
 
     public function new() {

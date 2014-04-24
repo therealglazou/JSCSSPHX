@@ -43,4 +43,6 @@ interface DOMCSSPseudoClass {
     var arguments : Array<DOMCSSValue>;
 
     function isPseudoElement() : Bool;
+    function isPseudoClass() : Bool;
+    function isFunctionalPseudoClass() : Bool;
 }
