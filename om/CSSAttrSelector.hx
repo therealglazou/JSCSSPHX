@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is JSCSSPHX code.
+ * The Original Code is JSCSSP code.
  *
  * The Initial Developer of the Original Code is
- * Samsung Electronics Co. Ltd
- * Portions created by the Initial Developer are Copyright (C) 2014
+* Disruptive Innovations SAS
+ * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -42,12 +42,33 @@ import om.interfaces.DOMCSSAttrSelector;
 class CSSAttrSelector implements DOMCSSAttrSelector {
     public var name : String;
     public var value : String;
-    public var caseSensitive : Bool;
+    public var caseInsensitive : Bool;
     public var operator : DOMCSSAttrSelectorFunction;
+
+    public var cssText(get, null) : String;
+
+    private function get_cssText() : String {
+        var s = "[" + this.name;
+        switch (this.operator) {
+            case ATTR_EXISTS:        s += "";
+            case ATTR_EQUALS:        s += "=";
+            case ATTR_INCLUDES:      s += "~=";
+            case ATTR_DASHMATCH:     s += "|=";
+            case ATTR_BEGINSMATCH:   s += "^=";
+            case ATTR_ENDSMATCH:     s += "$=";
+            case ATTR_CONTAINSMATCH: s += "$=";
+        }
+        if (this.operator != ATTR_EXISTS) {
+            s+= this.value;
+            if (this.caseInsensitive)
+                s += " i";
+        }
+        return s + "]";
+    }
 
     public function new() {
         this.name = "";
         this.value = "";
-        this.caseSensitive = false;
+        this.caseInsensitive = false;
     }
 }

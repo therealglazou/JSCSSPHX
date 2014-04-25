@@ -16,7 +16,7 @@
                         valid = true;
                         break;
                     } else {
-                        var d = this.parseDeclaration(token, descriptors, false, false, aSheet);
+                        var d = this.parseDeclaration(token, descriptors, false, false, aSheet, null);
                         s += ((d && descriptors.length) ? " " : "") + d;
                     }
                     token = this.getToken(true, false);

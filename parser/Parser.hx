@@ -3,7 +3,7 @@ package parser;
 import scanner.Scanner;
 import scanner.Token;
 import om.*;
-import om.interfaces.DOMCSSRule;
+import om.interfaces.*;
 
 enum ParserError {
     CHARSET_RULE_MISSING_SEMICOLON;
@@ -190,6 +190,10 @@ class Parser  {
         }
     }
 
+    public function getHexValue() : Token {
+        this.mToken = this.mScanner.nextHexValue();
+        return this.mToken;
+    }
     public function parseCharsetRule(aSheet : StyleSheet) : Bool {
         var token = this.getToken(false, false);
         var s = "";
@@ -437,9 +441,13 @@ class Parser  {
     
 
     public function parseStyleRule(aToken : Token, aSheet : StyleSheet, aRule : CSSRule) : String {
+        var selector = this.parseSelector(aToken, false);
+        trace("================");
+        /*
         this.preserveState();
         // first let's see if we have a selector here...
         var selector = this.parseSelector(aToken, false);
+		trace(selector);
         var valid = false;
         var declarations = [];
         var s = "";
@@ -473,6 +481,7 @@ class Parser  {
         
         if (valid) {
             var rule = new CSSStyleRule(selector.selector, STYLE_RULE, aSheet, aRule);
+            // TBD don't forget to add the declarations...
             rule.parsedCssText = s;
             if (null != aRule) // that's a media rule
                 cast(aRule, CSSMediaRule)._appendRule(rule);
@@ -483,6 +492,7 @@ class Parser  {
         this.restoreState();
         s = this.currentToken().value;
         this.addUnknownAtRule(aSheet, aRule, s);
+        */
 
         return "";
     }
@@ -493,276 +503,584 @@ class Parser  {
                                      aExpandShorthands : Bool,
                                      aSheet : StyleSheet,
                                      aRule : CSSRule) : String {
+        this.preserveState();
+        var blocks = [];
+        if (aToken.isIdent()) {
+            var descriptor = aToken.value.toLowerCase();
+            var token = this.getToken(true, true);
+            if (token.isSymbol(":")) {
+                var token = this.getToken(true, true);
+                
+                var declarations = [];
+                var value = this.parseDefaultPropertyValue(token, null, null);
+                token = this.currentToken();
+                if (null != value) // no error above
+                {
+                    var priority = false;
+                    if (token.isSymbol("!")) {
+                        token = this.getToken(true, true);
+                        if (token.isIdent("important")) {
+                            priority = true;
+                            token = this.getToken(true, true);
+                            if (token.isSymbol(";") || token.isSymbol("}")) {
+                                if (token.isSymbol("}"))
+                                    this.ungetToken();
+                            }
+                            else return "";
+                        }
+                        else return "";
+                    }
+                    else if (token.isNotNull() && !token.isSymbol(";") && !token.isSymbol("}"))
+                        return "";
+                    for (i in 0...declarations.length - 1) {
+                        declarations[i].priority = (priority ? "important" : "");
+                        aDecl.push({ property : declarations[i].property,
+                                     value:     declarations[i].value,
+                                     priority : declarations[i].priority });
+                    }
+                    return descriptor + ": " + value + ";";
+                }
+            }
+        }
+        else if (aToken.isComment()) {
+            /* Original jscssp code but we can't preserve comments inside
+             * CSS OM's CSSRule, unfortunately...
+             *
+            if (this.mPreserveComments) {
+                this.forgetState();
+                var comment = new CSSUnknownRule(aToken.value, UNKNOWN_RULE, aSheet, aRule);
+                comment.parsedCssText = aToken.value;
+                aDecl.push(comment);
+            }
+            return aToken.value;
+            */
+            return "";
+        }
+        
+        // we have an error here, let's skip it
+        this.restoreState();
+        var s = aToken.value;
+        blocks = [];
+        var token = this.getToken(false, false);
+        while (token.isNotNull()) {
+            s += token.value;
+            if ((token.isSymbol(";") || token.isSymbol("}")) && 0 == blocks.length) {
+                if (token.isSymbol("}"))
+                    this.ungetToken();
+                break;
+            } else if (token.isSymbol("{")
+                                 || token.isSymbol("(")
+                                 || token.isSymbol("[")
+                                 || token.isFunction()) {
+                blocks.push(token.isFunction() ? "(" : token.value);
+            } else if (token.isSymbol("}")
+                                 || token.isSymbol(")")
+                                 || token.isSymbol("]")) {
+                if (0 != blocks.length) {
+                    var ontop = blocks[blocks.length - 1];
+                    if ((token.isSymbol("}") && ontop == "{")
+                            || (token.isSymbol(")") && ontop == "(")
+                            || (token.isSymbol("]") && ontop == "[")) {
+                        blocks.pop();
+                    }
+                }
+            }
+            token = this.getToken(false, false);
+        }
         return "";
     }
     
-    public function parseSelector(aToken : Token, aParseSelectorOnly : Bool) : Selector {
-        var s = "";
-        var specificity : SelectorSpecificity = {a: 0, b: 0, c: 0, d: 0}; // CSS 2.1 section 6.4.3
-        var isFirstInChain = true;
+    public function isTokenCombinator(aToken : Token) : Bool {
+        return (aToken.isWhiteSpace()
+               || aToken.isSymbol("+")
+               || aToken.isSymbol("~")
+               || aToken.isSymbol(">"));
+    }
+
+    public function parseSelector(aToken : Token, aParseSelectorOnly : Bool) : DOMCSSSelector {
+        var rv : DOMCSSSelector = null;
+        var selector = rv;
+        var newInGroup = rv;
         var token = aToken;
-        var valid = false;
-        var combinatorFound = false;
+        var newInGroup = true;
+
+        while (true) {
+            // end of the buffer?
+            if (!token.isNotNull()) {
+                if (aParseSelectorOnly) // no need to look for a curly brace or anything
+                    return rv;
+                // oops
+                return null;
+            }
+
+            if (!aParseSelectorOnly && token.isSymbol("{")) {
+                break;
+            }
+
+            if (token.isSymbol(",")) { // group of selectors;
+                // we need a new selector in the chain
+                if (newInGroup)
+                    return null;
+                newInGroup = true;
+            }
+
+            else if (this.isTokenCombinator(token)) { // we have found a combinator
+                if (token.isWhiteSpace()) {
+                    if (!newInGroup && selector.combinator == COMBINATOR_NONE) {
+                        selector.combinator = COMBINATOR_DESCENDANT;
+                    }
+                }
+                else {
+                    if (newInGroup) {
+                        // cannot have a combinator in first position
+                        return null;
+                    }
+                    else if (selector.combinator == COMBINATOR_NONE
+                            || selector.combinator == COMBINATOR_DESCENDANT) {
+                        if (token.isSymbol("+"))
+                            selector.combinator = COMBINATOR_ADJACENT_SIBLING;
+                        else if (token.isSymbol("~"))
+                            selector.combinator = COMBINATOR_SIBLING;
+                        else if (token.isSymbol(">"))
+                            selector.combinator = COMBINATOR_CHILD;
+                    }
+                }
+            }
+
+            else {
+                // we have to consider this as the start of a complex selector
+                var s = this.parseComplexSelector(token, aParseSelectorOnly, false);
+                if (null == s)
+                    return null;
+                if (newInGroup) {
+                    if (null == rv) {
+                        rv = s;
+                        selector = rv;
+                    }
+                    else {
+                        selector = rv;
+                        while (null != selector.next)
+                            selector = selector.next;
+                        selector.next = s;
+                        selector = s;
+                    }
+                    newInGroup = false;
+                }
+                else {
+                    if (null == rv) {
+                        rv = s;
+                        selector = rv;
+                    }
+                    else {
+                        selector.parent = s;
+                        selector = s;
+                    }
+                }
+            }
+
+            token = this.getToken(false, true);
+        }
+
+        return rv;
+    }
+
+    public function parseComplexSelector(aToken : Token,
+                                         aParseSelectorOnly : Bool,
+                                         aNegated : Bool) : DOMCSSSelector {
+        var firstInChain = true;
+        var token = aToken;
+        var rv : DOMCSSSelector = new CSSSelector();
 
         while (true) {
             if (!token.isNotNull()) {
                 if (aParseSelectorOnly)
-                    return {selector: s, specificity: specificity };
+                    return rv;
                 return null;
             }
-            
-            if (!aParseSelectorOnly && token.isSymbol("{")) {
-                // end of selector
-                valid = !combinatorFound;
-                // don't unget if invalid since addUnknownRule is going to restore state anyway
-                if (valid)
+            if (firstInChain
+                && (token.isSymbol("*")
+                    || token.isIdent())) {
+                rv.elementType = token.value;
+            }
+
+            else if (token.isSymbol("#")) {
+                token = this.getToken(false, true);
+                if (!token.isNotNull())
+                    return null;
+                if (!token.isIdent())
+                    return null;
+                rv.IDList.push(token.value);
+            }
+
+            else if (token.isSymbol(".")) {
+                token = this.getToken(false, true);
+                if (!token.isNotNull())
+                    return null;
+                if (!token.isIdent())
+                    return null;
+                rv.ClassList.push(token.value);
+            }
+
+            else if (token.isSymbol(":")) {
+                token = this.getToken(false, true);
+                if (!token.isNotNull())
+                    return null;
+                if (token.isSymbol(":")) {
+                    token = this.getToken(false, true);
+                    if (!token.isNotNull())
+                        return null;
+                }
+                if (token.isIdent()) {
+                    var pc = new CSSPseudoClass();
+                    pc.name = token.value.toLowerCase();
+                    if (!pc.isPseudoClass() && !pc.isPseudoElement())
+                        return null;
+                    rv.PseudoClassList.push(pc);
+                }
+                else if (token.isFunction()) {
+                    var pc = new CSSPseudoClass();
+                    pc.name = token.value.toLowerCase();
+                    if (!pc.isFunctionalPseudoClass())
+                        return null;
+
+                    if (pc.name == "lang(") {
+                        var l = "";
+                        token = this.getToken(false, true);
+                        
+                        while (token.isNotNull()) {
+                            if (token.isSymbol(",") || token.isSymbol(")")) {
+                                if ("" == l) // can't happen in first position
+                                    return null;
+                                var v = new CSSValue(CSS_STRING);
+                                v.setStringValue(l);
+                                pc.arguments.push(v);
+                                if (token.isSymbol(")"))
+                                    break;
+                                l = "";
+                            }
+                            else if (l == "" && !token.isIdent() && !token.isSymbol("*"))
+                                return null; // selectors level 4 section 7.2
+                            else if (l == "*" && !token.isIdent())
+                                return null;
+
+                            l += token.value.toLowerCase();
+                            token = this.getToken(false, true);
+                        }
+                    }
+                    else if (pc.name == "not(" && !aNegated) {
+                        // Selectors ***4*** fast profile
+                        var s = this.parseComplexSelector(token, aParseSelectorOnly, true);
+                        if (null == s)
+                            return null;
+                        this.ungetToken();
+                        token = this.getToken(true, true);
+                        if (!token.isSymbol(")"))
+                            return null;
+                        rv.negations.push(s);
+                    }
+                    else { // :foo(an+b) case
+                        var pc = new CSSPseudoClass();
+                        pc.name = token.value.toLowerCase();
+                        var a = 0;
+                        var b = 0;
+
+                        token = this.getToken(true, true);
+                        if (token.isIdent("odd")) {
+                            a = 2;
+                            b = 1;
+                        }
+                        else if (token.isIdent("even")) {
+                            a = 2;
+                            b = 0;
+                        }
+                        else if (token.isNotNull() && !token.isSymbol(")")){
+                            var s : String = "";
+                            while (token.isNotNull() && !token.isSymbol(")")) {
+                                s += token.value;
+                                if (token.type == DIMENSION_TYPE)
+                                    s += token.unit;
+                                token = this.getToken(false, true);
+                            }
+                            s = StringTools.trim(s);
+                            var r1 = ~/^([\-\+]?[0-9]*)n$/gi;
+                            var r2 = ~/^([\-\+]\s*[0-9]+)$/gi;
+                            var r3 = ~/^([\-\+]?[0-9]*)n?\s*([\-\+]\s*[0-9]+)$/gi;
+                            if (r1.match(s)) {
+                                a = Std.parseInt(r1.matched(1));
+                                b = 0;
+                            }
+                            else if (r2.match(s)) {
+                                b = Std.parseInt(StringTools.replace(r2.matched(1), " ", ""));
+                                a = 0;
+                            }
+                            else if (r3.match(s)) {
+                                a = Std.parseInt(r3.matched(1));
+                                b = Std.parseInt(StringTools.replace(r3.matched(2), " ", ""));
+                            }
+                            else
+                                return null;
+                       }
+                        else
+                            return null;
+
+                        var va = new CSSValue(CSS_NUMBER);
+                        va.setFloatValue(a);
+                        var vb = new CSSValue(CSS_NUMBER);
+                        vb.setFloatValue(b);
+                        pc.arguments.push(va);
+                        pc.arguments.push(vb);
+                        rv.PseudoClassList.push(pc);
+                     }
+
+                    if (!token.isSymbol(")"))
+                        return null;
+                }
+                else
+                    return null;
+            }
+
+            else if (token.isSymbol("[")) {
+                // attr selector
+                var name = "";
+                var value = "";
+                var caseInsensitive = false;
+                var operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_EXISTS; 
+                token = this.getToken(false, true);
+                if (!token.isNotNull())
+                    return null;
+                if (token.isSymbol("*") || token.isIdent()) {
+                    name = token.value;
+                    token = this.getToken(true, true);
+                    if (!token.isNotNull())
+                        return null;
+                    if (token.isIncludes())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_INCLUDES;
+                    else if (token.isDashmatch())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_DASHMATCH;
+                    else if (token.isBeginsmatch())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_BEGINSMATCH;
+                    else if (token.isEndsmatch())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_ENDSMATCH;
+                    else if (token.isContainsmatch())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_CONTAINSMATCH;
+                    else if (token.isSymbol("="))
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_EQUALS;
+                    else if (token.isSymbol("]")) {
+                        var at = new CSSAttrSelector();
+                        at.name = name;
+                        at.operator = operator;
+                        rv.AttrList.push(at);
+                    }
+                    else
+                        return null;
+
+                    // we need a value
+                    token = this.getToken(true, true);
+                    if (!token.isNotNull())
+                        return null;
+                    if (token.isString() || token.isIdent()) {
+                        value = token.value;
+                        token = this.getToken(true, true);
+                        if (!token.isNotNull())
+                            return null;
+                        if (token.isIdent("i)")) {
+                            caseInsensitive = true;
+                            token = this.getToken(true, true);
+                        }
+                        if (token.isSymbol("]")) {
+                            var at = new CSSAttrSelector();
+                            at.name = name;
+                            at.operator = operator;
+                            at.value = value;
+                            at.caseInsensitive = caseInsensitive;
+                            rv.AttrList.push(at);
+                        }
+                        else
+                          return null;
+                    }
+                }
+                else
+                    return null;
+            }
+
+            else if (this.isTokenCombinator(token)
+                     || (aNegated && token.isSymbol(")"))
+                     || (!aParseSelectorOnly && token.isSymbol("{"))) {
+                this.ungetToken();
+                return rv;
+            }
+            firstInChain = false;
+            token = this.getToken(false, true);
+        }
+        return rv;
+    }
+
+
+    public function parseDefaultPropertyValue(token : Token,
+                                              cssValue : CSSValue,
+                                              parentCssValue : CSSValue) : CSSValue {
+
+        var blocks : Array<String> = [];
+        var foundComma = false;
+        while (token.isNotNull()) { // iterate until end of stylesheet if needed
+
+            // is it the end of this declaration or of the block?
+            if ((token.isSymbol(";")
+                 || token.isSymbol("}")
+                 || token.isSymbol("!"))
+                && 0 == blocks.length) {
+                // unget the current token if we're closing the block
+                if (token.isSymbol("}"))
                     this.ungetToken();
                 break;
             }
-            
-            if (token.isSymbol(",")) { // group of selectors
-                s += token.value;
-                isFirstInChain = true;
-                combinatorFound = false;
-                token = this.getToken(false, true);
-                continue;
-            }
-            // now combinators and grouping...
-            else if (!combinatorFound
-                             && (token.isWhiteSpace()
-                                     || token.isSymbol("+")
-                                     || token.isSymbol(">")
-                                     || token.isSymbol("~"))) {
-                                 if (token.isWhiteSpace()) {
-                                     s += " ";
-                                     var nextToken = this.lookAhead(true, true);
-                                     if (!nextToken.isNotNull()) {
-                                         if (aParseSelectorOnly)
-                                             return {selector: s, specificity: specificity };
-                                         return null;
-                                     }
-                                     if (nextToken.isSymbol(">")
-                                             || nextToken.isSymbol("+")
-                                             || nextToken.isSymbol("~")) {
-                                         token = this.getToken(true, true);
-                                         s += token.value + " ";
-                                         combinatorFound = true;
-                                     }
-                                 }
-                                 else {
-                                     s += token.value;
-                                     combinatorFound = true;
-                                 }
-                                 isFirstInChain = true;
-                                 token = this.getToken(true, true);
-                                 continue;
-                             }
-            else {
-                var simpleSelector = this.parseSimpleSelector(token, isFirstInChain, true);
-                if (null == simpleSelector)
-                    break; // error
-                s += simpleSelector.selector;
-                specificity.b += simpleSelector.specificity.b;
-                specificity.c += simpleSelector.specificity.c;
-                specificity.d += simpleSelector.specificity.d;
-                isFirstInChain = false;
-                combinatorFound = false;
-            }
-            
-            token = this.getToken(false, true);
-        }
-        
-        if (valid) {
-            return {selector: s, specificity: specificity };
-        }
-        return null;
-    }
-    
-    public function isPseudoElement(aIdent : String) : Bool {
-        switch (aIdent) {
-            case "first-letter":
-            case "first-line":
-            case "before":
-            case "after":
-            case "marker":
-                return true;
-        }
-        return false;
-    }
-    
-    public function parseSimpleSelector(token : Token, isFirstInChain : Bool, canNegate : Bool) : Selector
-    {
-        var s = "";
-        var specificity : SelectorSpecificity = {a: 0, b: 0, c: 0, d: 0}; // CSS 2.1 section 6.4.3
-        
-        if (isFirstInChain
-                && (token.isSymbol("*") || token.isSymbol("|") || token.isIdent())) {
-            // type or universal selector
-            if (token.isSymbol("*") || token.isIdent()) {
-                // we don't know yet if it's a prefix or a universal
-                // selector
-                s += token.value;
-                var isIdent = token.isIdent();
-                token = this.getToken(false, true);
-                if (token.isSymbol("|")) {
-                    // it's a prefix
-                    s += token.value;
-                    token = this.getToken(false, true);
-                    if (token.isIdent() || token.isSymbol("*")) {
-                        // ok we now have a type element or universal
-                        // selector
-                        s += token.value;
-                        if (token.isIdent())
-                            specificity.d++;
-                    } else
-                        // oops that's an error...
-                        return null;
-                } else {
-                    this.ungetToken();
-                    if (isIdent)
-                        specificity.d++;
-                }
-            } else if (token.isSymbol("|")) {
-                s += token.value;
-                token = this.getToken(false, true);
-                if (token.isIdent() || token.isSymbol("*")) {
-                    s += token.value;
-                    if (token.isIdent())
-                        specificity.d++;
-                } else
-                    // oops that's an error
+
+            // look for reserved idents
+            if (token.isIdent("inherit")
+                || token.isIdent("initial")) {
+                // this is ok only if we have no other value already
+                if (null != cssValue)
                     return null;
+                cssValue = new CSSValue(CSS_IDENT);
+                cssValue.setStringValue(token.value);
+                token = this.getToken(true, true);
+                break;
             }
-        }
-        
-        else if (token.isSymbol(".") || token.isSymbol("#")) {
-            var isClass = token.isSymbol(".");
-            s += token.value;
-            token = this.getToken(false, true);
-            if (token.isIdent()) {
-                s += token.value;
-                if (isClass)
-                    specificity.c++;
-                else
-                    specificity.b++;
+
+            // do we open a block?
+            else if (token.isSymbol("{")
+                     || token.isSymbol("(")
+                     || token.isSymbol("[")) {
+                blocks.push(token.value);
             }
-            else
-                return null;
-        }
-        
-        else if (token.isSymbol(":")) {
-            s += token.value;
-            token = this.getToken(false, true);
-            if (token.isSymbol(":")) {
-                s += token.value;
-                token = this.getToken(false, true);
-            }
-            if (token.isIdent()) {
-                s += token.value;
-                if (this.isPseudoElement(token.value))
-                    specificity.d++;
-                else
-                    specificity.c++;
-            }
-            else if (token.isFunction()) {
-                s += token.value;
-                if (token.isFunction(":not(")) {
-                    if (!canNegate)
-                        return null;
-                    token = this.getToken(true, true);
-                    var simpleSelector : Selector = this.parseSimpleSelector(token, isFirstInChain, false);
-                    if (null == simpleSelector)
-                        return null;
-                    else {
-                        s += simpleSelector.selector;
-                        token = this.getToken(true, true);
-                        if (token.isSymbol(")"))
-                            s += ")";
-                        else
-                            return null;
+
+            // or close a block?
+            else if (token.isSymbol("}")
+                     || token.isSymbol("]")
+                     || token.isSymbol(")")) {
+                // are we in a function?
+                if (null != parentCssValue
+                    && parentCssValue.type == CSS_VALUE_LIST
+                    && parentCssValue.getStringValue() != "") {
+                    // yes we are
+                    return parentCssValue;
+                }
+                if (0 != blocks.length) {
+                    var ontop = blocks[blocks.length - 1];
+                    if ((token.isSymbol("}") && ontop == "{")
+                        || (token.isSymbol("]") && ontop == "[")
+                        || (token.isSymbol(")") && ontop == "(")) {
+                        blocks.pop();
                     }
-                    specificity.c++;
+                }
+            }
+
+            var newValue : CSSValue = null;
+            if (token.isSymbol(",")) {
+                // we have a comma-separated of values or of list of values
+                if (null == cssValue) {
+                    if (null == parentCssValue) {
+                        // in that case, the comma is right after the declaration's colon
+                        // treat it as a symbol
+                        newValue = new CSSValue(CSS_SYMBOL);
+                        newValue.setStringValue(",");
+                    }
+                    else if (parentCssValue.commaSeparated) {
+                        // parent value list is already comma-separated
+                        // do nothing...
+                        foundComma = true;
+                    }
+                    else {
+                        foundComma = true;
+                        // parent value is whitespace-separated so it is
+                        // not the right parent for the next value
+                        if (null != parentCssValue.parentValue) // must be comma-separated
+                            parentCssValue = parentCssValue.parentValue;
+                        else {
+                            // create a new comma-separated list above the parent
+                            var newParentCssValue = new CSSValue(CSS_VALUE_LIST);
+                            newParentCssValue.commaSeparated = true;
+                            newParentCssValue.setStringValue("");
+                            newParentCssValue._appendValue(parentCssValue);
+                            parentCssValue = newParentCssValue;
+                        }
+                    }
                 }
                 else {
-                    while (true) {
-                        token = this.getToken(false, true);
-                        if (token.isSymbol(")")) {
-                            s += ")";
-                            break;
-                        } else
-                            s += token.value;
-                    }
-                    specificity.c++;
+                    foundComma = true;
+                    // we already have an arbitrary value
                 }
-            } else
-                return null;
-            
-        } else if (token.isSymbol("[")) {
-            s += "[";
-            token = this.getToken(true, true);
-            if (token.isIdent() || token.isSymbol("*")) {
-                s += token.value;
-                var nextToken = this.getToken(true, true);
-                if (nextToken.isSymbol("|")) {
-                    s += "|";
-                    token = this.getToken(true, true);
-                    if (token.isIdent())
-                        s += token.value;
-                    else
+            }
+
+            else {
+                if (token.isSymbol("#")) {
+                    token = this.getHexValue();
+                    if (!token.isHex())
                         return null;
-                } else
-                    this.ungetToken();
-            } else if (token.isSymbol("|")) {
-                s += "|";
-                token = this.getToken(true, true);
-                if (token.isIdent())
-                    s += token.value;
-                else
-                    return null;
-            }
-            else
-                return null;
-            
-            // nothing, =, *=, $=, ^=, |=
-            token = this.getToken(true, true);
-            if (token.isIncludes()
-                    || token.isDashmatch()
-                    || token.isBeginsmatch()
-                    || token.isEndsmatch()
-                    || token.isContainsmatch()
-                    || token.isSymbol("=")) {
-                s += token.value;
-                token = this.getToken(true, true);
-                if (token.isString() || token.isIdent()) {
-                    s += token.value;
+                    var length = token.value.length;
+                    if (length != 3 && length != 6)
+                        return null;
+                    if (token.value.match( ~/[a-fA-F0-9]/g ).length != length)
+                        return null;
+                    newValue = new CSSValue(CSS_HEX_COLOR);
+                    newValue.setStringValue(token.value);
+                }
+    
+                else if (token.isString()) {
+                    newValue = new CSSValue(CSS_STRING);
+                    newValue.setStringValue(token.value.substr(1, token.value.length - 2));
+                }
+    
+                else if (token.isNumber()) {
+                    newValue = new CSSValue(CSS_NUMBER);
+                    newValue.setFloatValue(Std.parseFloat(token.value));
+                }
+    
+                else if (token.isSymbol()) {
+                    newValue = new CSSValue(CSS_SYMBOL);
+                    newValue.setStringValue(token.value);
+                }
+    
+                else if (token.isIdent()) {
+                    newValue = new CSSValue(CSS_STRING);
+                    newValue.setStringValue(token.value);
+                }
+    
+                else if (token.isPercentage()) {
+                    newValue = new CSSValue(CSS_UNIT);
+                    newValue.setFloatValue(Std.parseFloat(token.value));
+                    newValue.setStringValue("%");
+                }
+    
+                else if (token.isDimension()) {
+                    newValue = new CSSValue(CSS_UNIT);
+                    newValue.setFloatValue(Std.parseFloat(token.value));
+                    newValue.setStringValue(token.unit);
+                }
+    
+                else if (token.isFunction()) {
+                    // the painful part...
+                    newValue = new CSSValue(CSS_VALUE_LIST);
+                    newValue.commaSeparated = true;
+                    newValue.setStringValue(token.value.substr(0, token.value.length - 1));
+    
                     token = this.getToken(true, true);
+                    this.parseDefaultPropertyValue(token, null, newValue);
                 }
-                else
-                    return null;
-                
-                if (token.isSymbol("]")) {
-                    s += token.value;
-                    specificity.c++;
-                }
-                else
-                    return null;
+			}
+
+            // do we have a new value to store
+            if (null != newValue) {
+                // yes we do...
+                if (null != parentCssValue) {
+					parentCssValue._appendValue(newValue);
+				}
             }
-            else if (token.isSymbol("]")) {
-                s += token.value;
-                specificity.c++;
-            }
-            else
-                return null;
-            
+
+            token = this.getToken(true, true);
         }
-        else if (token.isWhiteSpace()) {
-            var t = this.lookAhead(true, true);
-            if (t.isSymbol('{'))
-                return null;
-                }
-        if (null != s) {
-            return {selector: s, specificity: specificity};
-        }
-        return null;
-    };
+
+        return cssValue;
+    }
+    
 }

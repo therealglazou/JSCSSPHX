@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is JSCSSPHX code.
+ * The Original Code is JSCSSP code.
  *
  * The Initial Developer of the Original Code is
- * Samsung Electronics Co. Ltd
- * Portions created by the Initial Developer are Copyright (C) 2014
+* Disruptive Innovations SAS
+ * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -44,6 +44,7 @@ class CSSPseudoClass implements DOMCSSPseudoClass {
     public var name : String;
 
     public var arguments : Array<DOMCSSValue>;
+    public var cssText(get, null) : String;
 
     private var mPeudoElementList = [
         "after",
@@ -90,6 +91,17 @@ class CSSPseudoClass implements DOMCSSPseudoClass {
 
     public function isFunctionalPseudoClass() : Bool {
         return (-1 != this.mFunctionalPseudoClassList.indexOf(this.name));
+    }
+
+    private function get_cssText() : String {
+        if (this.isPseudoElement()) {
+            return "::" + this.name;
+        }
+
+        if (this.isPseudoClass()) {
+            return ":" + this.name;
+        }
+
     }
 
     public function new() {

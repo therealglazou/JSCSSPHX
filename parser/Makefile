@@ -16,6 +16,7 @@ FILES=main.hx \
 	styleRule.hx \
 	declarations.hx \
 	selectors.hx \
+	defaultProperty.hx \
 	$(NULL)
 
 all:

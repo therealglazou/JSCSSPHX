@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is JSCSSPHX code.
+ * The Original Code is JSCSSP code.
  *
  * The Initial Developer of the Original Code is
- * Samsung Electronics Co. Ltd
- * Portions created by the Initial Developer are Copyright (C) 2014
+* Disruptive Innovations SAS
+ * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -59,6 +59,7 @@ class CSSSelector implements DOMCSSSelector {
 
     public var combinator : DOMCSSCombinator;
     public var specificity(get, null) : DOMCSSSelectorSpecificity;
+    public var cssText(get, null) : String;
 
     private function get_specificity() : DOMCSSSelectorSpecificity {
         var specificity : DOMCSSSelectorSpecificity = {a: 0, b:0, c:0, d:0 };
@@ -98,6 +99,25 @@ class CSSSelector implements DOMCSSSelector {
         }
 
         return specificity;
+    }
+
+    private function get_cssText() : String {
+        var s = this.elementType;
+        for (i in 0...this.IDList.length-1)
+            s += "#" + this.IDList[i];
+        for (i in 0...this.ClassList.length-1)
+            s += "." + this.ClassList[i];
+
+        if (null != this.parent) {
+            return this.parent.cssText + (switch (this.combinator) {
+                        case COMBINATOR_DESCENDANT: " ";
+                        case COMBINATOR_CHILD:      ">";
+                        case COMBINATOR_ADJACENT_SIBLING : "+";
+                        case COMBINATOR_SIBLING : "~";
+                        case _: " ";
+                   }) + s;
+        }
+        return s;
     }
 
     public function hasPseudoElement() : Bool {

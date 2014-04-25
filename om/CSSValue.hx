@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is JSCSSPHX code.
+ * The Original Code is JSCSSP code.
  *
  * The Initial Developer of the Original Code is
- * Samsung Electronics Co. Ltd
- * Portions created by the Initial Developer are Copyright (C) 2014
+* Disruptive Innovations SAS
+ * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -75,7 +75,7 @@ class CSSValue implements DOMCSSValue {
             case CSS_UNIT:
                 return Std.string(this.mFloat) + this.mString;
             case CSS_NUMBER:
-                return Std.string(this.mFloat) + this.mString;
+                return Std.string(this.mFloat);
             case CSS_VALUE_LIST:
                 var rv =  this.mValueArray
                            .map(function(n) {return n.cssText; } )
@@ -129,6 +129,22 @@ class CSSValue implements DOMCSSValue {
      * EXTRAS
      */
     public var parentValue : CSSValue;
+
+    public function _appendValue(value : CSSValue) : Void {
+        this.mValueArray.push(value);
+		value.parentValue = this;
+    }
+
+    public function transmuteLastValueToList() : CSSValue {
+        if (0 == this.mValueArray.length)
+            throw INVALID_ACCESS_ERR;
+        var value = this.mValueArray.pop();
+        var newList = new CSSValue(CSS_VALUE_LIST);
+        value.parentValue = newList;
+        newList._appendValue(value);
+        this.mValueArray.push(newList);
+        return newList;
+    }
 
     /*
      * CONSTRUCTOR

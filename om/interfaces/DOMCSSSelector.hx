@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is JSCSSPHX code.
+ * The Original Code is JSCSSP code.
  *
  * The Initial Developer of the Original Code is
- * Samsung Electronics Co. Ltd
- * Portions created by the Initial Developer are Copyright (C) 2014
+* Disruptive Innovations SAS
+ * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -71,4 +71,5 @@ interface DOMCSSSelector {
 
     var specificity(get, null) : DOMCSSSelectorSpecificity;
     function hasPseudoElement() : Bool;
+    var cssText(get, null) : String;
 }

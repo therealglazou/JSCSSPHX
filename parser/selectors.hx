@@ -175,6 +175,7 @@
                             l += token.value.toLowerCase();
                             token = this.getToken(false, true);
                         }
+                        // TBD
                     }
                     else if (pc.name == "not(" && !aNegated) {
                         // Selectors ***4*** fast profile
@@ -301,7 +302,7 @@
                             at.name = name;
                             at.operator = operator;
                             at.value = value;
-                            at.caseSensitive = !caseInsensitive;
+                            at.caseInsensitive = caseInsensitive;
                             rv.AttrList.push(at);
                         }
                         else

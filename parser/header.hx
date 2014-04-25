@@ -3,7 +3,7 @@ package parser;
 import scanner.Scanner;
 import scanner.Token;
 import om.*;
-import om.interfaces.DOMCSSRule;
+import om.interfaces.*;
 
 enum ParserError {
     CHARSET_RULE_MISSING_SEMICOLON;

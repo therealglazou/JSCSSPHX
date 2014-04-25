@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is JSCSSPHX code.
+ * The Original Code is JSCSSP code.
  *
  * The Initial Developer of the Original Code is
- * Samsung Electronics Co. Ltd
- * Portions created by the Initial Developer are Copyright (C) 2014
+* Disruptive Innovations SAS
+ * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -111,7 +111,7 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
         // TBD validate value when parsing and om are done
         // TBD deal with shorthands
         var index = this.mPropertyNameArray.indexOf(propertyName);
-        var cssValue = new CSSValue();
+        var cssValue = new CSSValue(CSS_NUMBER);
         cssValue.cssText = value;
         if (-1 == index) {
             this.mPropertyNameArray.push(propertyName);

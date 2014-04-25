@@ -1,8 +1,12 @@
 
     public function parseStyleRule(aToken : Token, aSheet : StyleSheet, aRule : CSSRule) : String {
+        var selector = this.parseSelector(aToken, false);
+        trace("================");
+        /*
         this.preserveState();
         // first let's see if we have a selector here...
         var selector = this.parseSelector(aToken, false);
+		trace(selector);
         var valid = false;
         var declarations = [];
         var s = "";
@@ -36,6 +40,7 @@
         
         if (valid) {
             var rule = new CSSStyleRule(selector.selector, STYLE_RULE, aSheet, aRule);
+            // TBD don't forget to add the declarations...
             rule.parsedCssText = s;
             if (null != aRule) // that's a media rule
                 cast(aRule, CSSMediaRule)._appendRule(rule);
@@ -46,6 +51,7 @@
         this.restoreState();
         s = this.currentToken().value;
         this.addUnknownAtRule(aSheet, aRule, s);
+        */
 
         return "";
     }

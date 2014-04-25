@@ -55,3 +55,8 @@
             this.mPreservedTokens.pop();
         }
     }
+
+    public function getHexValue() : Token {
+        this.mToken = this.mScanner.nextHexValue();
+        return this.mToken;
+    }
