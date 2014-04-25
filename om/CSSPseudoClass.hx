@@ -71,12 +71,12 @@ class CSSPseudoClass implements DOMCSSPseudoClass {
     ];
 
     private var mFunctionalPseudoClassList = [
-        "lang",
-        "nth-child",
-        "nth-last-child",
-        "nth-of-type",
-        "nth-last-of-type",
-        "not"
+        "lang(",
+        "nth-child(",
+        "nth-last-child(",
+        "nth-of-type(",
+        "nth-last-of-type(",
+        "not("
     ];
 
 

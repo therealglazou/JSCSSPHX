@@ -50,7 +50,7 @@ class CSSSelector implements DOMCSSSelector {
     public var AttrList : Array<DOMCSSAttrSelector>;
     public var PseudoClassList : Array<DOMCSSPseudoClass>;
 
-    public var negations : DOMCSSSelector;
+    public var negations : Array<DOMCSSSelector>;
     public var parent : DOMCSSSelector;
 
     public var next : DOMCSSSelector;
@@ -78,17 +78,19 @@ class CSSSelector implements DOMCSSSelector {
             }
 
             if (null != s.negations) {
-                // :not() itself is not counted, only the argument matters
-                specificity.a += s.negations.IDList.length;
-                specificity.b += s.negations.ClassList.length + s.negations.AttrList.length;
-                if (s.negations.elementType != "*")
-                    specificity.c += 1;
-                for (i in 0...s.negations.PseudoClassList.length-1) {
-                    var p = cast(s.negations.PseudoClassList[i], CSSPseudoClass);
-                    if (p.isPseudoElement())
+                for (j in 0...s.negations.length-1) {
+                    // :not() itself is not counted, only the argument matters
+                    specificity.a += s.negations[j].IDList.length;
+                    specificity.b += s.negations[j].ClassList.length + s.negations[j].AttrList.length;
+                    if (s.negations[j].elementType != "*")
                         specificity.c += 1;
-                    else
-                        specificity.b += 1;
+                    for (i in 0...s.negations[j].PseudoClassList.length-1) {
+                        var p = cast(s.negations[j].PseudoClassList[i], CSSPseudoClass);
+                        if (p.isPseudoElement())
+                            specificity.c += 1;
+                        else
+                            specificity.b += 1;
+                    }
                 }
             }
 
@@ -112,7 +114,7 @@ class CSSSelector implements DOMCSSSelector {
         this.ClassList = [];
         this.AttrList = [];
         this.PseudoClassList = [];
-        this.negations = null;
+        this.negations = [];
         this.parent = null;
         this.next = null;
         this.combinator = COMBINATOR_NONE;

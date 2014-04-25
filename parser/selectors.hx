@@ -1,270 +1,326 @@
 
-    public function parseSelector(aToken : Token, aParseSelectorOnly : Bool) : Selector {
-        var s = "";
-        var specificity : SelectorSpecificity = {a: 0, b: 0, c: 0, d: 0}; // CSS 2.1 section 6.4.3
-        var isFirstInChain = true;
+    public function isTokenCombinator(aToken : Token) : Bool {
+        return (aToken.isWhiteSpace()
+               || aToken.isSymbol("+")
+               || aToken.isSymbol("~")
+               || aToken.isSymbol(">"));
+    }
+
+    public function parseSelector(aToken : Token, aParseSelectorOnly : Bool) : DOMCSSSelector {
+        var rv : DOMCSSSelector = null;
+        var selector = rv;
+        var newInGroup = rv;
         var token = aToken;
-        var valid = false;
-        var combinatorFound = false;
+        var newInGroup = true;
+
+        while (true) {
+            // end of the buffer?
+            if (!token.isNotNull()) {
+                if (aParseSelectorOnly) // no need to look for a curly brace or anything
+                    return rv;
+                // oops
+                return null;
+            }
+
+            if (!aParseSelectorOnly && token.isSymbol("{")) {
+                break;
+            }
+
+            if (token.isSymbol(",")) { // group of selectors;
+                // we need a new selector in the chain
+                if (newInGroup)
+                    return null;
+                newInGroup = true;
+            }
+
+            else if (this.isTokenCombinator(token)) { // we have found a combinator
+                if (token.isWhiteSpace()) {
+                    if (!newInGroup && selector.combinator == COMBINATOR_NONE) {
+                        selector.combinator = COMBINATOR_DESCENDANT;
+                    }
+                }
+                else {
+                    if (newInGroup) {
+                        // cannot have a combinator in first position
+                        return null;
+                    }
+                    else if (selector.combinator == COMBINATOR_NONE
+                            || selector.combinator == COMBINATOR_DESCENDANT) {
+                        if (token.isSymbol("+"))
+                            selector.combinator = COMBINATOR_ADJACENT_SIBLING;
+                        else if (token.isSymbol("~"))
+                            selector.combinator = COMBINATOR_SIBLING;
+                        else if (token.isSymbol(">"))
+                            selector.combinator = COMBINATOR_CHILD;
+                    }
+                }
+            }
+
+            else {
+                // we have to consider this as the start of a complex selector
+                var s = this.parseComplexSelector(token, aParseSelectorOnly, false);
+                if (null == s)
+                    return null;
+                if (newInGroup) {
+                    if (null == rv) {
+                        rv = s;
+                        selector = rv;
+                    }
+                    else {
+                        selector = rv;
+                        while (null != selector.next)
+                            selector = selector.next;
+                        selector.next = s;
+                        selector = s;
+                    }
+                    newInGroup = false;
+                }
+                else {
+                    if (null == rv) {
+                        rv = s;
+                        selector = rv;
+                    }
+                    else {
+                        selector.parent = s;
+                        selector = s;
+                    }
+                }
+            }
+
+            token = this.getToken(false, true);
+        }
+
+        return rv;
+    }
+
+    public function parseComplexSelector(aToken : Token,
+                                         aParseSelectorOnly : Bool,
+                                         aNegated : Bool) : DOMCSSSelector {
+        var firstInChain = true;
+        var token = aToken;
+        var rv : DOMCSSSelector = new CSSSelector();
 
         while (true) {
             if (!token.isNotNull()) {
                 if (aParseSelectorOnly)
-                    return {selector: s, specificity: specificity };
+                    return rv;
                 return null;
             }
-            
-            if (!aParseSelectorOnly && token.isSymbol("{")) {
-                // end of selector
-                valid = !combinatorFound;
-                // don't unget if invalid since addUnknownRule is going to restore state anyway
-                if (valid)
-                    this.ungetToken();
-                break;
+            if (firstInChain
+                && (token.isSymbol("*")
+                    || token.isIdent())) {
+                rv.elementType = token.value;
             }
-            
-            if (token.isSymbol(",")) { // group of selectors
-                s += token.value;
-                isFirstInChain = true;
-                combinatorFound = false;
+
+            else if (token.isSymbol("#")) {
                 token = this.getToken(false, true);
-                continue;
-            }
-            // now combinators and grouping...
-            else if (!combinatorFound
-                             && (token.isWhiteSpace()
-                                     || token.isSymbol("+")
-                                     || token.isSymbol(">")
-                                     || token.isSymbol("~"))) {
-                                 if (token.isWhiteSpace()) {
-                                     s += " ";
-                                     var nextToken = this.lookAhead(true, true);
-                                     if (!nextToken.isNotNull()) {
-                                         if (aParseSelectorOnly)
-                                             return {selector: s, specificity: specificity };
-                                         return null;
-                                     }
-                                     if (nextToken.isSymbol(">")
-                                             || nextToken.isSymbol("+")
-                                             || nextToken.isSymbol("~")) {
-                                         token = this.getToken(true, true);
-                                         s += token.value + " ";
-                                         combinatorFound = true;
-                                     }
-                                 }
-                                 else {
-                                     s += token.value;
-                                     combinatorFound = true;
-                                 }
-                                 isFirstInChain = true;
-                                 token = this.getToken(true, true);
-                                 continue;
-                             }
-            else {
-                var simpleSelector = this.parseSimpleSelector(token, isFirstInChain, true);
-                if (null == simpleSelector)
-                    break; // error
-                s += simpleSelector.selector;
-                specificity.b += simpleSelector.specificity.b;
-                specificity.c += simpleSelector.specificity.c;
-                specificity.d += simpleSelector.specificity.d;
-                isFirstInChain = false;
-                combinatorFound = false;
-            }
-            
-            token = this.getToken(false, true);
-        }
-        
-        if (valid) {
-            return {selector: s, specificity: specificity };
-        }
-        return null;
-    }
-    
-    public function isPseudoElement(aIdent : String) : Bool {
-        switch (aIdent) {
-            case "first-letter":
-            case "first-line":
-            case "before":
-            case "after":
-            case "marker":
-                return true;
-        }
-        return false;
-    }
-    
-    public function parseSimpleSelector(token : Token, isFirstInChain : Bool, canNegate : Bool) : Selector
-    {
-        var s = "";
-        var specificity : SelectorSpecificity = {a: 0, b: 0, c: 0, d: 0}; // CSS 2.1 section 6.4.3
-        
-        if (isFirstInChain
-                && (token.isSymbol("*") || token.isSymbol("|") || token.isIdent())) {
-            // type or universal selector
-            if (token.isSymbol("*") || token.isIdent()) {
-                // we don't know yet if it's a prefix or a universal
-                // selector
-                s += token.value;
-                var isIdent = token.isIdent();
-                token = this.getToken(false, true);
-                if (token.isSymbol("|")) {
-                    // it's a prefix
-                    s += token.value;
-                    token = this.getToken(false, true);
-                    if (token.isIdent() || token.isSymbol("*")) {
-                        // ok we now have a type element or universal
-                        // selector
-                        s += token.value;
-                        if (token.isIdent())
-                            specificity.d++;
-                    } else
-                        // oops that's an error...
-                        return null;
-                } else {
-                    this.ungetToken();
-                    if (isIdent)
-                        specificity.d++;
-                }
-            } else if (token.isSymbol("|")) {
-                s += token.value;
-                token = this.getToken(false, true);
-                if (token.isIdent() || token.isSymbol("*")) {
-                    s += token.value;
-                    if (token.isIdent())
-                        specificity.d++;
-                } else
-                    // oops that's an error
+                if (!token.isNotNull())
                     return null;
+                if (!token.isIdent())
+                    return null;
+                rv.IDList.push(token.value);
             }
-        }
-        
-        else if (token.isSymbol(".") || token.isSymbol("#")) {
-            var isClass = token.isSymbol(".");
-            s += token.value;
-            token = this.getToken(false, true);
-            if (token.isIdent()) {
-                s += token.value;
-                if (isClass)
-                    specificity.c++;
-                else
-                    specificity.b++;
-            }
-            else
-                return null;
-        }
-        
-        else if (token.isSymbol(":")) {
-            s += token.value;
-            token = this.getToken(false, true);
-            if (token.isSymbol(":")) {
-                s += token.value;
+
+            else if (token.isSymbol(".")) {
                 token = this.getToken(false, true);
+                if (!token.isNotNull())
+                    return null;
+                if (!token.isIdent())
+                    return null;
+                rv.ClassList.push(token.value);
             }
-            if (token.isIdent()) {
-                s += token.value;
-                if (this.isPseudoElement(token.value))
-                    specificity.d++;
-                else
-                    specificity.c++;
-            }
-            else if (token.isFunction()) {
-                s += token.value;
-                if (token.isFunction(":not(")) {
-                    if (!canNegate)
+
+            else if (token.isSymbol(":")) {
+                token = this.getToken(false, true);
+                if (!token.isNotNull())
+                    return null;
+                if (token.isSymbol(":")) {
+                    token = this.getToken(false, true);
+                    if (!token.isNotNull())
                         return null;
-                    token = this.getToken(true, true);
-                    var simpleSelector : Selector = this.parseSimpleSelector(token, isFirstInChain, false);
-                    if (null == simpleSelector)
+                }
+                if (token.isIdent()) {
+                    var pc = new CSSPseudoClass();
+                    pc.name = token.value.toLowerCase();
+                    if (!pc.isPseudoClass() && !pc.isPseudoElement())
                         return null;
-                    else {
-                        s += simpleSelector.selector;
+                    rv.PseudoClassList.push(pc);
+                }
+                else if (token.isFunction()) {
+                    var pc = new CSSPseudoClass();
+                    pc.name = token.value.toLowerCase();
+                    if (!pc.isFunctionalPseudoClass())
+                        return null;
+
+                    if (pc.name == "lang(") {
+                        var l = "";
+                        token = this.getToken(false, true);
+                        
+                        while (token.isNotNull()) {
+                            if (token.isSymbol(",") || token.isSymbol(")")) {
+                                if ("" == l) // can't happen in first position
+                                    return null;
+                                var v = new CSSValue(CSS_STRING);
+                                v.setStringValue(l);
+                                pc.arguments.push(v);
+                                if (token.isSymbol(")"))
+                                    break;
+                                l = "";
+                            }
+                            else if (l == "" && !token.isIdent() && !token.isSymbol("*"))
+                                return null; // selectors level 4 section 7.2
+                            else if (l == "*" && !token.isIdent())
+                                return null;
+
+                            l += token.value.toLowerCase();
+                            token = this.getToken(false, true);
+                        }
+                    }
+                    else if (pc.name == "not(" && !aNegated) {
+                        // Selectors ***4*** fast profile
+                        var s = this.parseComplexSelector(token, aParseSelectorOnly, true);
+                        if (null == s)
+                            return null;
+                        this.ungetToken();
                         token = this.getToken(true, true);
-                        if (token.isSymbol(")"))
-                            s += ")";
+                        if (!token.isSymbol(")"))
+                            return null;
+                        rv.negations.push(s);
+                    }
+                    else { // :foo(an+b) case
+                        var pc = new CSSPseudoClass();
+                        pc.name = token.value.toLowerCase();
+                        var a = 0;
+                        var b = 0;
+
+                        token = this.getToken(true, true);
+                        if (token.isIdent("odd")) {
+                            a = 2;
+                            b = 1;
+                        }
+                        else if (token.isIdent("even")) {
+                            a = 2;
+                            b = 0;
+                        }
+                        else if (token.isNotNull() && !token.isSymbol(")")){
+                            var s : String = "";
+                            while (token.isNotNull() && !token.isSymbol(")")) {
+                                s += token.value;
+                                if (token.type == DIMENSION_TYPE)
+                                    s += token.unit;
+                                token = this.getToken(false, true);
+                            }
+                            s = StringTools.trim(s);
+                            var r1 = ~/^([\-\+]?[0-9]*)n$/gi;
+                            var r2 = ~/^([\-\+]\s*[0-9]+)$/gi;
+                            var r3 = ~/^([\-\+]?[0-9]*)n?\s*([\-\+]\s*[0-9]+)$/gi;
+                            if (r1.match(s)) {
+                                a = Std.parseInt(r1.matched(1));
+                                b = 0;
+                            }
+                            else if (r2.match(s)) {
+                                b = Std.parseInt(StringTools.replace(r2.matched(1), " ", ""));
+                                a = 0;
+                            }
+                            else if (r3.match(s)) {
+                                a = Std.parseInt(r3.matched(1));
+                                b = Std.parseInt(StringTools.replace(r3.matched(2), " ", ""));
+                            }
+                            else
+                                return null;
+                       }
                         else
                             return null;
-                    }
-                    specificity.c++;
+
+                        var va = new CSSValue(CSS_NUMBER);
+                        va.setFloatValue(a);
+                        var vb = new CSSValue(CSS_NUMBER);
+                        vb.setFloatValue(b);
+                        pc.arguments.push(va);
+                        pc.arguments.push(vb);
+                        rv.PseudoClassList.push(pc);
+                     }
+
+                    if (!token.isSymbol(")"))
+                        return null;
                 }
-                else {
-                    while (true) {
-                        token = this.getToken(false, true);
-                        if (token.isSymbol(")")) {
-                            s += ")";
-                            break;
-                        } else
-                            s += token.value;
-                    }
-                    specificity.c++;
-                }
-            } else
-                return null;
-            
-        } else if (token.isSymbol("[")) {
-            s += "[";
-            token = this.getToken(true, true);
-            if (token.isIdent() || token.isSymbol("*")) {
-                s += token.value;
-                var nextToken = this.getToken(true, true);
-                if (nextToken.isSymbol("|")) {
-                    s += "|";
+                else
+                    return null;
+            }
+
+            else if (token.isSymbol("[")) {
+                // attr selector
+                var name = "";
+                var value = "";
+                var caseInsensitive = false;
+                var operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_EXISTS; 
+                token = this.getToken(false, true);
+                if (!token.isNotNull())
+                    return null;
+                if (token.isSymbol("*") || token.isIdent()) {
+                    name = token.value;
                     token = this.getToken(true, true);
-                    if (token.isIdent())
-                        s += token.value;
+                    if (!token.isNotNull())
+                        return null;
+                    if (token.isIncludes())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_INCLUDES;
+                    else if (token.isDashmatch())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_DASHMATCH;
+                    else if (token.isBeginsmatch())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_BEGINSMATCH;
+                    else if (token.isEndsmatch())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_ENDSMATCH;
+                    else if (token.isContainsmatch())
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_CONTAINSMATCH;
+                    else if (token.isSymbol("="))
+                        operator = om.interfaces.DOMCSSAttrSelector.DOMCSSAttrSelectorFunction.ATTR_EQUALS;
+                    else if (token.isSymbol("]")) {
+                        var at = new CSSAttrSelector();
+                        at.name = name;
+                        at.operator = operator;
+                        rv.AttrList.push(at);
+                    }
                     else
                         return null;
-                } else
-                    this.ungetToken();
-            } else if (token.isSymbol("|")) {
-                s += "|";
-                token = this.getToken(true, true);
-                if (token.isIdent())
-                    s += token.value;
-                else
-                    return null;
-            }
-            else
-                return null;
-            
-            // nothing, =, *=, $=, ^=, |=
-            token = this.getToken(true, true);
-            if (token.isIncludes()
-                    || token.isDashmatch()
-                    || token.isBeginsmatch()
-                    || token.isEndsmatch()
-                    || token.isContainsmatch()
-                    || token.isSymbol("=")) {
-                s += token.value;
-                token = this.getToken(true, true);
-                if (token.isString() || token.isIdent()) {
-                    s += token.value;
+
+                    // we need a value
                     token = this.getToken(true, true);
-                }
-                else
-                    return null;
-                
-                if (token.isSymbol("]")) {
-                    s += token.value;
-                    specificity.c++;
+                    if (!token.isNotNull())
+                        return null;
+                    if (token.isString() || token.isIdent()) {
+                        value = token.value;
+                        token = this.getToken(true, true);
+                        if (!token.isNotNull())
+                            return null;
+                        if (token.isIdent("i)")) {
+                            caseInsensitive = true;
+                            token = this.getToken(true, true);
+                        }
+                        if (token.isSymbol("]")) {
+                            var at = new CSSAttrSelector();
+                            at.name = name;
+                            at.operator = operator;
+                            at.value = value;
+                            at.caseSensitive = !caseInsensitive;
+                            rv.AttrList.push(at);
+                        }
+                        else
+                          return null;
+                    }
                 }
                 else
                     return null;
             }
-            else if (token.isSymbol("]")) {
-                s += token.value;
-                specificity.c++;
+
+            else if (this.isTokenCombinator(token)
+                     || (aNegated && token.isSymbol(")"))
+                     || (!aParseSelectorOnly && token.isSymbol("{"))) {
+                this.ungetToken();
+                return rv;
             }
-            else
-                return null;
-            
+            firstInChain = false;
+            token = this.getToken(false, true);
         }
-        else if (token.isWhiteSpace()) {
-            var t = this.lookAhead(true, true);
-            if (t.isSymbol('{'))
-                return null;
-                }
-        if (null != s) {
-            return {selector: s, specificity: specificity};
-        }
-        return null;
-    };
+        return rv;
+    }
+

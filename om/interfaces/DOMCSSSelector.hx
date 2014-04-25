@@ -61,7 +61,7 @@ interface DOMCSSSelector {
     var AttrList : Array<DOMCSSAttrSelector>;
     var PseudoClassList : Array<DOMCSSPseudoClass>;
 
-    var negations : DOMCSSSelector;
+    var negations : Array<DOMCSSSelector>;
     var parent : DOMCSSSelector;
     var next : DOMCSSSelector;
 
