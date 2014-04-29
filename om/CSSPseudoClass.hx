@@ -97,11 +97,38 @@ class CSSPseudoClass implements DOMCSSPseudoClass {
         if (this.isPseudoElement()) {
             return "::" + this.name;
         }
-
         if (this.isPseudoClass()) {
             return ":" + this.name;
         }
 
+        if ("lang(" == this.name) {
+            var s = "";
+            for (i in 0...this.arguments.length-1) {
+                if ("" != s)
+                    s += ", ";
+                s += this.arguments[i].cssText;
+            }
+            return ":lang(" + s + ")";
+        }
+
+        // we're in the :foo(an+b) case because negations are stored differently
+        if (this.arguments.length != 2) // Houston, we have a problem...
+            return "";
+        var a = this.arguments[1].getFloatValue();
+        var b = this.arguments[1].getFloatValue();
+        var s = "";
+        if (a != 0)
+            s = Std.string(a) + "n";
+        if (b > 0) {
+            if ("" == s)
+                s = Std.string(b);
+            else
+                s += "+" + Std.string(b);
+        }
+        else if (b < 0)
+            s += Std.string(b);
+
+        return ":" + this.name + s + ")";
     }
 
     public function new() {
