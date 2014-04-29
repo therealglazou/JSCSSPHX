@@ -103,10 +103,18 @@ class CSSSelector implements DOMCSSSelector {
 
     private function get_cssText() : String {
         var s = this.elementType;
+
         for (i in 0...this.IDList.length-1)
             s += "#" + this.IDList[i];
+
         for (i in 0...this.ClassList.length-1)
             s += "." + this.ClassList[i];
+
+        for (i in 0...this.negations.length-1)
+            s += ":not(" + this.negations[i].cssText + ")";
+
+        for (i in 0...this.PseudoClassList.length-1)
+            s += this.PseudoClassList[i].cssText;
 
         if (null != this.parent) {
             return this.parent.cssText + (switch (this.combinator) {
