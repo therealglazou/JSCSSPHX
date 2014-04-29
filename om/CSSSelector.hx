@@ -79,13 +79,13 @@ class CSSSelector implements DOMCSSSelector {
             }
 
             if (null != s.negations) {
-                for (j in 0...s.negations.length-1) {
+                for (j in 0...s.negations.length) {
                     // :not() itself is not counted, only the argument matters
                     specificity.a += s.negations[j].IDList.length;
                     specificity.b += s.negations[j].ClassList.length + s.negations[j].AttrList.length;
                     if (s.negations[j].elementType != "*")
                         specificity.c += 1;
-                    for (i in 0...s.negations[j].PseudoClassList.length-1) {
+                    for (i in 0...s.negations[j].PseudoClassList.length) {
                         var p = cast(s.negations[j].PseudoClassList[i], CSSPseudoClass);
                         if (p.isPseudoElement())
                             specificity.c += 1;
@@ -104,17 +104,19 @@ class CSSSelector implements DOMCSSSelector {
     private function get_cssText() : String {
         var s = this.elementType;
 
-        for (i in 0...this.IDList.length-1)
+        for (i in 0...this.IDList.length)
             s += "#" + this.IDList[i];
 
-        for (i in 0...this.ClassList.length-1)
+        for (i in 0...this.ClassList.length)
             s += "." + this.ClassList[i];
 
-        for (i in 0...this.negations.length-1)
+        for (i in 0...this.negations.length)
             s += ":not(" + this.negations[i].cssText + ")";
 
-        for (i in 0...this.PseudoClassList.length-1)
+        for (i in 0...this.PseudoClassList.length) {
+            var p = this.PseudoClassList[i];
             s += this.PseudoClassList[i].cssText;
+        }
 
         if (null != this.parent) {
             return this.parent.cssText + (switch (this.combinator) {
@@ -129,7 +131,7 @@ class CSSSelector implements DOMCSSSelector {
     }
 
     public function hasPseudoElement() : Bool {
-        for (i in 0...this.PseudoClassList.length-1) {
+        for (i in 0...this.PseudoClassList.length) {
             if (this.PseudoClassList[i].isPseudoElement())
                 return true;
         }

@@ -103,7 +103,7 @@ class CSSPseudoClass implements DOMCSSPseudoClass {
 
         if ("lang(" == this.name) {
             var s = "";
-            for (i in 0...this.arguments.length-1) {
+            for (i in 0...this.arguments.length) {
                 if ("" != s)
                     s += ", ";
                 s += this.arguments[i].cssText;

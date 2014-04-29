@@ -83,7 +83,7 @@ class CSSKeyframesRule extends CSSRule
 
     override function get_cssText() : String {
         var rv ="@keyframes " + this.name + " { ";
-        for (i in 0...this.cssRules.length - 1)
+        for (i in 0...this.cssRules.length)
             rv += this.cssRules.item(i).cssText;
         return rv;
     }

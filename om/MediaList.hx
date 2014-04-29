@@ -61,7 +61,7 @@ class MediaList implements DOMMediaList {
         // TBD : validate v and throw SYNTAX_ERR if invalid
         var rv = v.split(",");
         mMediaArray = [];
-        for (i in 0...rv.length - 1) {
+        for (i in 0...rv.length) {
             rv[i] = StringTools.trim(rv[i]);
             if (0 == i || rv[i] != rv[i-1])
                 mMediaArray.push(rv[i]);

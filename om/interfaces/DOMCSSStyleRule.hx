@@ -37,6 +37,7 @@
 
 package om.interfaces;
 
+import om.interfaces.DOMCSSSelector;
 import om.interfaces.DOMCSSStyleDeclaration;
 
 interface DOMCSSStyleRule {
@@ -45,10 +46,16 @@ interface DOMCSSStyleRule {
      *          attribute DOMString        selectorText;
      *                                       // raises(DOMException) on setting
      */
-    var selectorText(default, set) : String;
+    var selectorText(get, set) : String;
 
     /*
      * readonly attribute nsIDOMCSSStyleDeclaration  style;
      */
     var style(default, null) : DOMCSSStyleDeclaration;
+
+    /*
+     * EXTENSION
+     *          attribute IDOMCSSSelector selector;
+     */
+    var selector : DOMCSSSelector;
 }

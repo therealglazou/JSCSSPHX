@@ -60,7 +60,7 @@ class CSSStyleDeclaration implements DOMCSSStyleDeclaration {
 
     private function get_cssText() : String {
         var rv : String = "";
-        for (i in 0...this.mPropertyNameArray.length - 1) {
+        for (i in 0...this.mPropertyNameArray.length) {
             rv += ("" != rv) ? " " : "";
             rv += this.mPropertyNameArray[i] + ": " + this.mPropertyValueArray[i].cssText;
             if ("" != this.mPropertyPriorityArray[i])

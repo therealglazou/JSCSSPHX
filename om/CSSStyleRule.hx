@@ -42,6 +42,7 @@ import om.interfaces.DOMCSSStyleRule;
 import om.interfaces.DOMCSSStyleDeclaration;
 import om.interfaces.DOMCSSRule;
 import om.interfaces.DOMCSSStyleSheet;
+import om.interfaces.DOMCSSSelector;
 
 class CSSStyleRule extends CSSRule
                    implements DOMCSSStyleRule {
@@ -49,16 +50,28 @@ class CSSStyleRule extends CSSRule
     /* from DOMCSSStyleRule interface
      * 
      */
-    public var selectorText(default, set) : String;
+    public var selectorText(get, set) : String;
     public var style(default, null) : DOMCSSStyleDeclaration;
+    public var selector : DOMCSSSelector;
 
     /*
      * http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSStyleRule
      */
 
+    private function get_selectorText() : String {
+        var s = "";
+        var selector = this.selector;
+        while (null != selector) {
+            if ("" != s)
+                s += ", ";
+            s += selector.cssText;
+            selector = selector.next;
+        }
+        return "";
+    }
+
     private function set_selectorText(v : String) {
         /// TBD when selector parsing is done
-        this.selectorText = v;
         return v;
     }
 
@@ -75,12 +88,12 @@ class CSSStyleRule extends CSSRule
     /*
      * CONSTRUCTOR
      */
-    public function new(aSelectorText : String,
+    public function new(aSelector : DOMCSSSelector,
                         aType : DOMCSSRuleType,
                         aSheet: DOMCSSStyleSheet,
                         aRule : DOMCSSRule) {
         super(aType, aSheet, aRule);
-        this.selectorText = aSelectorText;
+        this.selector = aSelector;
         this.style = new CSSStyleDeclaration();
     }
 }
