@@ -67,11 +67,9 @@
                         selector = rv;
                     }
                     else {
+                        s.next = rv;
+                        rv = s;
                         selector = rv;
-                        while (null != selector.next)
-                            selector = selector.next;
-                        selector.next = s;
-                        selector = s;
                     }
                     newInGroup = false;
                 }
@@ -81,8 +79,10 @@
                         selector = rv;
                     }
                     else {
-                        selector.parent = s;
+                        s.parent = selector;
+                        s.next = selector.next;
                         selector = s;
+                        rv = s;
                     }
                 }
             }
@@ -106,6 +106,11 @@
                     return rv;
                 return null;
             }
+            if (token.isSymbol(",")) {
+                this.ungetToken();
+                return rv;
+            }
+
             if (firstInChain
                 && (token.isSymbol("*")
                     || token.isIdent())) {
