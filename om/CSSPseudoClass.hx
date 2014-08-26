@@ -14,12 +14,12 @@
  * The Original Code is JSCSSP code.
  *
  * The Initial Developer of the Original Code is
-* Disruptive Innovations SAS
+ * Disruptive Innovations SAS
  * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   Daniel Glazman <d.glazman@partner.samsung.com>
+ *   Daniel Glazman <daniel.glazman@disruptive-innovations.com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),
@@ -114,11 +114,16 @@ class CSSPseudoClass implements DOMCSSPseudoClass {
         // we're in the :foo(an+b) case because negations are stored differently
         if (this.arguments.length != 2) // Houston, we have a problem...
             return "";
-        var a = this.arguments[1].getFloatValue();
+        var a = this.arguments[0].getFloatValue();
         var b = this.arguments[1].getFloatValue();
         var s = "";
-        if (a != 0)
-            s = Std.string(a) + "n";
+        if (a != 0) {
+            switch (a) {
+                case -1: s = "-n";
+                case 1:  s = "n";
+                default: s = Std.string(a) + "n";
+            }
+        }
         if (b > 0) {
             if ("" == s)
                 s = Std.string(b);

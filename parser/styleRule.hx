@@ -1,21 +1,13 @@
 
     public function parseStyleRule(aToken : Token, aSheet : StyleSheet, aRule : CSSRule) : String {
         var selector = this.parseSelector(aToken, false);
-        trace("================");
-        /*
-        this.preserveState();
-        // first let's see if we have a selector here...
-        var selector = this.parseSelector(aToken, false);
-		trace(selector);
+
         var valid = false;
         var declarations = [];
-        var s = "";
         if (null != selector) {
-            selector.selector = StringTools.trim(selector.selector);
-            s = selector.selector;
             var token = this.getToken(true, true);
             if (token.isSymbol("{")) {
-                s += " { ";
+                // we found the declaration block
                 var token = this.getToken(true, false);
                 while (true) {
                     if (!token.isNotNull()) {
@@ -39,7 +31,7 @@
         }
         
         if (valid) {
-            var rule = new CSSStyleRule(selector.selector, STYLE_RULE, aSheet, aRule);
+            var rule = new CSSStyleRule(selector, STYLE_RULE, aSheet, aRule);
             // TBD don't forget to add the declarations...
             rule.parsedCssText = s;
             if (null != aRule) // that's a media rule
@@ -51,7 +43,6 @@
         this.restoreState();
         s = this.currentToken().value;
         this.addUnknownAtRule(aSheet, aRule, s);
-        */
 
         return "";
     }

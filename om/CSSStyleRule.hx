@@ -14,12 +14,12 @@
  * The Original Code is JSCSSP code.
  *
  * The Initial Developer of the Original Code is
-* Disruptive Innovations SAS
+ * Disruptive Innovations SAS
  * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   Daniel Glazman <d.glazman@partner.samsung.com>
+ *   Daniel Glazman <daniel.glazman@disruptive-innovations.com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),

@@ -45,7 +45,7 @@
                 this.forgetState();
                 var rule = new CSSImportRule(href, IMPORT_RULE, aSheet, null);
                 rule.parsedCssText = s;
-                for (i in 0...media.length - 1)
+                for (i in 0...media.length)
                     rule.media.appendMedium(media[i]);
                 aSheet._appendRule(rule);
                 return true;

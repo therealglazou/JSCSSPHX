@@ -34,7 +34,7 @@
                     }
                     else if (token.isNotNull() && !token.isSymbol(";") && !token.isSymbol("}"))
                         return "";
-                    for (i in 0...declarations.length - 1) {
+                    for (i in 0...declarations.length) {
                         declarations[i].priority = (priority ? "important" : "");
                         aDecl.push({ property : declarations[i].property,
                                      value:     declarations[i].value,
