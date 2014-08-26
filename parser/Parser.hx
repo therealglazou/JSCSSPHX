@@ -480,14 +480,13 @@ class Parser  {
     public function parseStyleRule(aToken : Token, aSheet : StyleSheet, aRule : CSSRule) : String {
         var selector = this.parseSelector(aToken, false);
         while (null != selector) {
-            trace("================ " + selector.cssText);
             selector = selector.next;
         }
         /*
         this.preserveState();
         // first let's see if we have a selector here...
         var selector = this.parseSelector(aToken, false);
-		trace(selector);
+
         var valid = false;
         var declarations = [];
         var s = "";
